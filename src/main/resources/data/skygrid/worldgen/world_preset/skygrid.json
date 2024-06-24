@@ -1,0 +1,15 @@
+{
+  "dimensions": {
+    "minecraft:overworld": {
+      "type": "minecraft:overworld",
+      "generator": {
+        "type": "skygrid:skygrid",
+        "settings": "minecraft:overworld",
+        "biome_source": {
+          "type": "minecraft:multi_noise",
+          "preset": "minecraft:overworld"
+        }
+      }
+    }
+  }
+}

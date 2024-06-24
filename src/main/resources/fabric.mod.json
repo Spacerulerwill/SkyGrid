@@ -1,0 +1,31 @@
+{
+	"schemaVersion": 1,
+	"id": "skygrid",
+	"version": "${version}",
+	"name": "SkyGrid",
+	"description": "SkyGrid adds a new world type - an infinite grid of randomly generated blocks",
+	"authors": [
+		"Spacerulerwill"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "MIT",
+	"icon": "assets/skygrid/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"net.spacerulerwill.skygrid.SkyGrid"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.15.11",
+		"minecraft": "~1.21",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
