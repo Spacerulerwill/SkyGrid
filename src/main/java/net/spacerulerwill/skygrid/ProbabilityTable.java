@@ -40,7 +40,7 @@ public class ProbabilityTable<T> {
                 return probability.object;
             }
         }
-        throw new IllegalStateException("Error with cumulative probabilities, please check the normalization process.");
+        return probabilities[probabilities.length-1].object;
     }
 
 }
