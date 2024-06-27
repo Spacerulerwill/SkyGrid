@@ -6,7 +6,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.MobSpawnerBlockEntity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.ChunkRegion;
@@ -18,9 +17,7 @@ import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.GenerationStep;
 import net.minecraft.world.gen.StructureAccessor;
-import net.minecraft.world.gen.chunk.Blender;
-import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.VerticalBlockSample;
+import net.minecraft.world.gen.chunk.*;
 import net.minecraft.world.gen.noise.NoiseConfig;
 
 import java.util.List;
@@ -31,78 +28,29 @@ import net.spacerulerwill.skygrid.ProbabilityTable.Probability;
 public class SkyGridChunkGenerator extends ChunkGenerator {
     public static final MapCodec<SkyGridChunkGenerator> MAP_CODEC = RecordCodecBuilder.mapCodec(instance ->
             instance.group(
-                    BiomeSource.CODEC.fieldOf("biome_source").forGetter(SkyGridChunkGenerator::getBiomeSource)
+                    BiomeSource.CODEC.fieldOf("biome_source").forGetter(SkyGridChunkGenerator::getBiomeSource),
+                    SkyGridChunkGeneratorConfig.CODEC.fieldOf("settings").forGetter(SkyGridChunkGenerator::getConfig)
             ).apply(instance, SkyGridChunkGenerator::new)
     );
 
+    private final SkyGridChunkGeneratorConfig config;
     private final Random random;
+    private final ProbabilityTable<Block> blockProbabilities;
 
-    // Black spawn candidates
-    private static final ProbabilityTable<Block> blockProbailities = new ProbabilityTable<Block>(new Probability[] {
-            new Probability<>(Blocks.STONE, 120.0),
-            new Probability<>(Blocks.GRASS_BLOCK, 80.0),
-            new Probability<>(Blocks.DIRT, 20.0),
-            new Probability<>(Blocks.WATER, 10.0),
-            new Probability<>(Blocks.LAVA, 5.0),
-            new Probability<>(Blocks.SAND, 20.0),
-            new Probability<>(Blocks.GRAVEL, 10.0),
-            new Probability<>(Blocks.GOLD_ORE, 10.0),
-            new Probability<>(Blocks.IRON_ORE, 20.0),
-            new Probability<>(Blocks.COAL_ORE, 40.0),
-            new Probability<>(Blocks.OAK_LOG, 100.0),
-            new Probability<>(Blocks.OAK_LEAVES, 40.0),
-            new Probability<>(Blocks.GLASS, 1.0),
-            new Probability<>(Blocks.LAPIS_ORE, 5.0),
-            new Probability<>(Blocks.SANDSTONE, 10.0),
-            new Probability<>(Blocks.STICKY_PISTON, 1.0),
-            new Probability<>(Blocks.COBWEB, 10.0),
-            new Probability<>(Blocks.DEAD_BUSH, 3.0),
-            new Probability<>(Blocks.PISTON, 1.0),
-            new Probability<>(Blocks.WHITE_WOOL, 25.0),
-            new Probability<>(Blocks.DANDELION, 2.0),
-            new Probability<>(Blocks.POPPY, 2.0),
-            new Probability<>(Blocks.BROWN_MUSHROOM, 2.0),
-            new Probability<>(Blocks.RED_MUSHROOM, 2.0),
-            new Probability<>(Blocks.TNT, 2.0),
-            new Probability<>(Blocks.BOOKSHELF, 3.0),
-            new Probability<>(Blocks.MOSSY_COBBLESTONE, 5.0),
-            new Probability<>(Blocks.OBSIDIAN, 1.0),
-            new Probability<>(Blocks.SPAWNER, 1.0),
-            new Probability<>(Blocks.CHEST, 1.0),
-            new Probability<>(Blocks.DIAMOND_ORE, 1.0),
-            new Probability<>(Blocks.REDSTONE_ORE, 8.0),
-            new Probability<>(Blocks.ICE, 4.0),
-            new Probability<>(Blocks.SNOW_BLOCK, 8.0),
-            new Probability<>(Blocks.CACTUS, 1.0),
-            new Probability<>(Blocks.CLAY, 20.0),
-            new Probability<>(Blocks.SUGAR_CANE, 15.0),
-            new Probability<>(Blocks.PUMPKIN, 5.0),
-            new Probability<>(Blocks.MELON, 5.0),
-            new Probability<>(Blocks.MYCELIUM, 15.0)
-    });
-
-    // Candidates for mob spawners that generate in the skygrid, all have equal chance
-    private static final EntityType<?>[] mobSpawnerCandidates = new EntityType<?>[]{
-            EntityType.CREEPER,
-            EntityType.SKELETON,
-            EntityType.SPIDER,
-            EntityType.CAVE_SPIDER,
-            EntityType.ZOMBIE,
-            EntityType.SLIME,
-            EntityType.PIG,
-            EntityType.SHEEP,
-            EntityType.COW,
-            EntityType.CHICKEN,
-            EntityType.SQUID,
-            EntityType.WOLF,
-            EntityType.ENDERMAN,
-            EntityType.SILVERFISH,
-            EntityType.VILLAGER
-    };
-
-    public SkyGridChunkGenerator(BiomeSource biomeSource) {
+    public SkyGridChunkGenerator(BiomeSource biomeSource, SkyGridChunkGeneratorConfig config) {
         super(biomeSource);
+        this.config = config;
         random = Random.create();
+        blockProbabilities = createBlockProbabilities(config.blocks());
+    }
+
+    private ProbabilityTable<Block> createBlockProbabilities(List<BlockWeight> blockWeights) {
+        ProbabilityTable.Probability<Block>[] probabilities = new Probability[blockWeights.size()];
+        for (int i = 0; i < blockWeights.size(); i++) {
+            BlockWeight blockWeight = blockWeights.get(i);
+            probabilities[i] = new ProbabilityTable.Probability<>(blockWeight.block(), blockWeight.weight());
+        }
+        return new ProbabilityTable<>(probabilities);
     }
 
     // Seed the random number generator with a hash function based on the column x and z
@@ -111,8 +59,10 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    protected MapCodec<? extends ChunkGenerator> getCodec() {
-        return MAP_CODEC;
+    protected MapCodec<? extends ChunkGenerator> getCodec() { return MAP_CODEC; }
+
+    public SkyGridChunkGeneratorConfig getConfig() {
+        return config;
     }
 
     /*
@@ -170,11 +120,11 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
                 seedRandomForColumn(worldX, worldZ);
                 for (int y = getMinimumY(); y <= getMinimumY() + getWorldHeight(); y += 4) {
                     BlockPos blockPos = new BlockPos(x, y, z);
-                    Block block = blockProbailities.pickRandom(random);
+                    Block block = blockProbabilities.pickRandom(random);
                     chunk.setBlockState(blockPos, block.getDefaultState(), false);
                     if (block.equals(Blocks.SPAWNER)) {
                         MobSpawnerBlockEntity mobSpawnerBlockEntity = new MobSpawnerBlockEntity(new BlockPos(worldX, y, worldZ), block.getDefaultState());
-                        mobSpawnerBlockEntity.setEntityType(mobSpawnerCandidates[random.nextInt(mobSpawnerCandidates.length)], Random.create());
+                        mobSpawnerBlockEntity.setEntityType(config.spawnerEntities().get(random.nextInt(config.spawnerEntities().size())), Random.create());
                         chunk.setBlockEntity(mobSpawnerBlockEntity);
                     }
                 }
@@ -189,8 +139,8 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
         BlockState[] states = new BlockState[getWorldHeight() / 4 + 1];
         seedRandomForColumn(x, z);
         for (int y = getMinimumY(); y <= getMinimumY() + getWorldHeight(); y += 4) {
-            states[(y - getMinimumY()) / 4] = blockProbailities.pickRandom(random).getDefaultState();
+            states[(y - getMinimumY()) / 4] = blockProbabilities.pickRandom(random).getDefaultState();
         }
-        return new VerticalBlockSample(-64, states);
+        return new VerticalBlockSample(getMinimumY(), states);
     }
 }
