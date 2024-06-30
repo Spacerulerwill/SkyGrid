@@ -1,6 +1,5 @@
 package net.spacerulerwill.skygrid.mixin;
 
-import net.minecraft.client.gui.screen.world.CustomizeBuffetLevelScreen;
 import net.minecraft.client.gui.screen.world.LevelScreenProvider;
 import net.minecraft.client.gui.screen.world.WorldCreator;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -19,7 +18,8 @@ public class WorldCreatorMixin {
     private void injected(CallbackInfoReturnable<LevelScreenProvider> cir) {
         RegistryEntry<WorldPreset> registryEntry = ((WorldCreator)(Object)this).getWorldType().preset();
         if (registryEntry != null && registryEntry.matchesId(Identifier.of(SkyGrid.MOD_ID, "skygrid"))) {
-            cir.setReturnValue((parent, generatorOptionsHolder) -> new CustomizeSkyGridScreen(parent));
+            cir.setReturnValue((parent, generatorOptionsHolder) ->
+                    new CustomizeSkyGridScreen(parent));
             cir.cancel();
         }
     }

@@ -6,6 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.MobSpawnerBlockEntity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.ChunkRegion;
@@ -20,6 +21,7 @@ import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.*;
 import net.minecraft.world.gen.noise.NoiseConfig;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -42,6 +44,39 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
         this.config = config;
         random = Random.create();
         blockProbabilities = createBlockProbabilities(config.blocks());
+    }
+
+    public static SkyGridChunkGeneratorConfig getDefaultOverworldConfig() {
+        return new SkyGridChunkGeneratorConfig(
+                Arrays.asList(
+                        new BlockWeight(Blocks.STONE, 1.0)
+                ),
+                Arrays.asList(
+                        EntityType.ZOMBIE
+                )
+        );
+    }
+
+    public static SkyGridChunkGeneratorConfig getDefaultNetherConfig() {
+        return new SkyGridChunkGeneratorConfig(
+                Arrays.asList(
+                        new BlockWeight(Blocks.STONE, 1.0)
+                ),
+                Arrays.asList(
+                        EntityType.ZOMBIE
+                )
+        );
+    }
+
+    public static SkyGridChunkGeneratorConfig getDefaultEndConfig() {
+        return new SkyGridChunkGeneratorConfig(
+                Arrays.asList(
+                        new BlockWeight(Blocks.STONE, 1.0)
+                ),
+                Arrays.asList(
+                        EntityType.ZOMBIE
+                )
+        );
     }
 
     private ProbabilityTable<Block> createBlockProbabilities(List<BlockWeight> blockWeights) {
