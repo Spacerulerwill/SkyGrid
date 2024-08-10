@@ -16,9 +16,7 @@ import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
 import net.minecraft.client.gui.widget.TabNavigationWidget;
 import net.minecraft.client.gui.widget.ThreePartsLayoutWidget;
 import net.minecraft.client.world.GeneratorOptionsHolder;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.*;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
@@ -28,30 +26,34 @@ import net.minecraft.world.biome.source.FixedBiomeSource;
 import net.minecraft.world.dimension.DimensionOptions;
 import net.minecraft.world.dimension.DimensionOptionsRegistryHolder;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.dimension.DimensionTypes;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.function.Consumer;
+import java.util.Set;
 
 @Environment(EnvType.CLIENT)
 public class CustomizeSkyGridScreen extends Screen {
+    // UI stuff
     CreateWorldScreen parent;
     private final ThreePartsLayoutWidget layout = new ThreePartsLayoutWidget(this);
     private final TabManager tabManager = new TabManager(this::addDrawableChild, this::remove);
     @Nullable
     private TabNavigationWidget tabNavigation;
-    private SkyGridChunkGeneratorConfig overworldConfig = SkyGridChunkGenerator.getDefaultOverworldConfig();
-    private SkyGridChunkGeneratorConfig netherConfig = SkyGridChunkGenerator.getDefaultNetherConfig();
-    private SkyGridChunkGeneratorConfig endConfig = SkyGridChunkGenerator.getDefaultEndConfig();
+    // Other stuff
+    private final Map<RegistryKey<DimensionOptions>, SkyGridChunkGeneratorConfig> dimensionChunkGeneratorConfigs;
 
     public CustomizeSkyGridScreen(
             CreateWorldScreen parent
     ) {
         super(Text.translatable("createWorld.customize.skygrid.title"));
         this.parent = parent;
+        dimensionChunkGeneratorConfigs = new HashMap<>();
+        dimensionChunkGeneratorConfigs.put(DimensionOptions.OVERWORLD, SkyGridChunkGenerator.getDefaultOverworldConfig());
+        dimensionChunkGeneratorConfigs.put(DimensionOptions.NETHER, SkyGridChunkGenerator.getDefaultNetherConfig());
+        dimensionChunkGeneratorConfigs.put(DimensionOptions.END, SkyGridChunkGenerator.getDefaultEndConfig());
     }
 
     protected void init() {
@@ -82,9 +84,8 @@ public class CustomizeSkyGridScreen extends Screen {
     public void initTabNavigation() {
         tabNavigation = TabNavigationWidget.builder(tabManager, width)
                 .tabs(new Tab[]{
-                        new CustomizeSkyGridScreen.OverworldTab(),
-                        new CustomizeSkyGridScreen.NetherTab(),
-                        new CustomizeSkyGridScreen.EndTab()
+                        new BlockTab(),
+                        new MobSpawnerTab(),
                 }).build();
         addDrawableChild(tabNavigation);
         if (tabNavigation != null) {
@@ -105,59 +106,44 @@ public class CustomizeSkyGridScreen extends Screen {
 
     // Method to apply the configurations to respective chunk generators
     private void applyConfigurations() {
-        parent.getWorldCreator().applyModifier(createModifier(BiomeKeys.PLAINS, DimensionOptions.OVERWORLD, overworldConfig));
-        parent.getWorldCreator().applyModifier(createModifier(BiomeKeys.NETHER_WASTES, DimensionOptions.NETHER, netherConfig));
-        parent.getWorldCreator().applyModifier(createModifier(BiomeKeys.THE_END, DimensionOptions.END, endConfig));
+        dimensionChunkGeneratorConfigs.forEach((dimensionOptionsRegistryKey, config) -> {
+            parent.getWorldCreator().applyModifier(createModifier(dimensionOptionsRegistryKey, config));
+        });
     }
 
-    private GeneratorOptionsHolder.RegistryAwareModifier createModifier(RegistryKey<Biome> biomeKey, RegistryKey<DimensionOptions> dimensionOptions, SkyGridChunkGeneratorConfig config) {
+    private GeneratorOptionsHolder.RegistryAwareModifier createModifier(RegistryKey<DimensionOptions> dimensionOptionsRegistryKey, SkyGridChunkGeneratorConfig config) {
         return (dynamicRegistryManager, dimensionsRegistryHolder) -> {
             // We must create an ENTIRELY NEW dimension options map to replace it because it is immutable... :(
+            // Get our registries from the dynamic registry manager
             Registry<Biome> biomeRegistry = dynamicRegistryManager.get(RegistryKeys.BIOME);
-            RegistryEntry<Biome> biomeEntry = biomeRegistry.entryOf(biomeKey);
-            Registry<DimensionType> dimensionTypeRegistry = dynamicRegistryManager.get(RegistryKeys.DIMENSION_TYPE);
+            RegistryEntry<Biome> biomeEntry = biomeRegistry.entryOf(BiomeKeys.THE_VOID);
 
-            // new chunk generator and new map
+            // new chunk generator and new map (copy of previous)
             ChunkGenerator chunkGenerator = new SkyGridChunkGenerator(new FixedBiomeSource(biomeEntry), config);
             Map<RegistryKey<DimensionOptions>, DimensionOptions> updatedDimensions = new HashMap<>(dimensionsRegistryHolder.dimensions());
-            // Add dimensions
-            if (dimensionOptions.equals(DimensionOptions.OVERWORLD)) {
-                RegistryEntry<DimensionType> overworldDimensionTypeEntry = dimensionTypeRegistry.entryOf(DimensionTypes.OVERWORLD);
-                DimensionOptions newDimensionOptions = new DimensionOptions(overworldDimensionTypeEntry, chunkGenerator);
-                updatedDimensions.put(dimensionOptions, newDimensionOptions);
-            } else if (dimensionOptions.equals(DimensionOptions.NETHER)) {
-                RegistryEntry<DimensionType> netherDimensionTypeEntry = dimensionTypeRegistry.entryOf(DimensionTypes.THE_NETHER);
-                DimensionOptions newDimensionOptions = new DimensionOptions(netherDimensionTypeEntry, chunkGenerator);
-                updatedDimensions.put(dimensionOptions, newDimensionOptions);
-            } else if (dimensionOptions.equals(DimensionOptions.END)) {
-                RegistryEntry<DimensionType> endDimensionTypeEntry = dimensionTypeRegistry.entryOf(DimensionTypes.THE_END);
-                DimensionOptions newDimensionOptions = new DimensionOptions(endDimensionTypeEntry, chunkGenerator);
-                updatedDimensions.put(dimensionOptions, newDimensionOptions);
-            }
 
-            // Return as an immmutable map
+            // Get the dimension type from the dimension option registry and create new dimension options and update in the map
+            DimensionOptions dimensionOptions = parent.getWorldCreator().getGeneratorOptionsHolder().selectedDimensions().dimensions().get(dimensionOptionsRegistryKey);
+            RegistryEntry<DimensionType> dimensionTypeRegistryEntry = dimensionOptions.dimensionTypeEntry();
+            DimensionOptions newDimensionOptions = new DimensionOptions(dimensionTypeRegistryEntry, chunkGenerator);
+            updatedDimensions.put(dimensionOptionsRegistryKey, newDimensionOptions);
+
+            // Return as an immutable map
             return new DimensionOptionsRegistryHolder(ImmutableMap.copyOf(updatedDimensions));
         };
     }
 
     @Environment(EnvType.CLIENT)
-    private class OverworldTab extends GridScreenTab {
-        public OverworldTab() {
-            super(Text.translatable("createWorld.customize.skygrid.tab.overworld"));
+    private class BlockTab extends GridScreenTab {
+        public BlockTab() {
+            super(Text.translatable("createWorld.customize.skygrid.tab.block"));
         }
     }
 
     @Environment(EnvType.CLIENT)
-    private class NetherTab extends GridScreenTab {
-        public NetherTab() {
-            super(Text.translatable("createWorld.customize.skygrid.tab.nether"));
-        }
-    }
-
-    @Environment(EnvType.CLIENT)
-    private class EndTab extends GridScreenTab {
-        public EndTab() {
-            super(Text.translatable("createWorld.customize.skygrid.tab.end"));
+    private class MobSpawnerTab extends GridScreenTab {
+        public MobSpawnerTab() {
+            super(Text.translatable("createWorld.customize.skygrid.tab.mob_spawner"));
         }
     }
 }

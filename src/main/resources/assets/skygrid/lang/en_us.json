@@ -1,7 +1,7 @@
 {
   "generator.skygrid.skygrid": "SkyGrid",
   "createWorld.customize.skygrid.title": "SkyGrid Customization",
-  "createWorld.customize.skygrid.tab.overworld": "Overworld",
-  "createWorld.customize.skygrid.tab.nether": "The Nether",
+  "createWorld.customize.skygrid.tab.block": "Blocks",
+  "createWorld.customize.skygrid.tab.mob_spawner": "Mob Spawners",
   "createWorld.customize.skygrid.tab.end": "The End"
 }
