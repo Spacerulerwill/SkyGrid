@@ -57,14 +57,14 @@ public class CustomizeSkyGridScreen extends Screen {
     }
 
     protected void init() {
-        DirectionalLayoutWidget directionalLayoutWidget = (DirectionalLayoutWidget) layout.addFooter(DirectionalLayoutWidget.horizontal().spacing(8));
+        DirectionalLayoutWidget directionalLayoutWidget = layout.addFooter(DirectionalLayoutWidget.horizontal().spacing(8));
         // Add the Cancel and Done buttons
         directionalLayoutWidget.add(ButtonWidget.builder(ScreenTexts.DONE, (button) -> {
             applyConfigurations();
-            this.close();
+            close();
         }).build());
         directionalLayoutWidget.add(ButtonWidget.builder(ScreenTexts.CANCEL, (button) -> {
-            this.close();
+            close();
         }).build());
 
         layout.forEachChild((child) -> {
@@ -106,27 +106,29 @@ public class CustomizeSkyGridScreen extends Screen {
 
     // Method to apply the configurations to respective chunk generators
     private void applyConfigurations() {
-        dimensionChunkGeneratorConfigs.forEach((dimensionOptionsRegistryKey, config) -> {
-            parent.getWorldCreator().applyModifier(createModifier(dimensionOptionsRegistryKey, config));
-        });
+        parent.getWorldCreator().applyModifier(createModifier());
     }
 
-    private GeneratorOptionsHolder.RegistryAwareModifier createModifier(RegistryKey<DimensionOptions> dimensionOptionsRegistryKey, SkyGridChunkGeneratorConfig config) {
+    private GeneratorOptionsHolder.RegistryAwareModifier createModifier() {
         return (dynamicRegistryManager, dimensionsRegistryHolder) -> {
             // We must create an ENTIRELY NEW dimension options map to replace it because it is immutable... :(
             // Get our registries from the dynamic registry manager
             Registry<Biome> biomeRegistry = dynamicRegistryManager.get(RegistryKeys.BIOME);
             RegistryEntry<Biome> biomeEntry = biomeRegistry.entryOf(BiomeKeys.THE_VOID);
 
-            // new chunk generator and new map (copy of previous)
-            ChunkGenerator chunkGenerator = new SkyGridChunkGenerator(new FixedBiomeSource(biomeEntry), config);
+            // New map
             Map<RegistryKey<DimensionOptions>, DimensionOptions> updatedDimensions = new HashMap<>(dimensionsRegistryHolder.dimensions());
 
-            // Get the dimension type from the dimension option registry and create new dimension options and update in the map
-            DimensionOptions dimensionOptions = parent.getWorldCreator().getGeneratorOptionsHolder().selectedDimensions().dimensions().get(dimensionOptionsRegistryKey);
-            RegistryEntry<DimensionType> dimensionTypeRegistryEntry = dimensionOptions.dimensionTypeEntry();
-            DimensionOptions newDimensionOptions = new DimensionOptions(dimensionTypeRegistryEntry, chunkGenerator);
-            updatedDimensions.put(dimensionOptionsRegistryKey, newDimensionOptions);
+            dimensionChunkGeneratorConfigs.forEach((dimensionOptionsRegistryKey, config) -> {
+                // new chunk generator
+                ChunkGenerator chunkGenerator = new SkyGridChunkGenerator(new FixedBiomeSource(biomeEntry), config);
+                // Get the dimension type from the dimension option registry and create new dimension options and update in the map
+                DimensionOptions dimensionOptions = parent.getWorldCreator().getGeneratorOptionsHolder().selectedDimensions().dimensions().get(dimensionOptionsRegistryKey);
+                RegistryEntry<DimensionType> dimensionTypeRegistryEntry = dimensionOptions.dimensionTypeEntry();
+                DimensionOptions newDimensionOptions = new DimensionOptions(dimensionTypeRegistryEntry, chunkGenerator);
+                updatedDimensions.put(dimensionOptionsRegistryKey, newDimensionOptions);
+
+            });
 
             // Return as an immutable map
             return new DimensionOptionsRegistryHolder(ImmutableMap.copyOf(updatedDimensions));
