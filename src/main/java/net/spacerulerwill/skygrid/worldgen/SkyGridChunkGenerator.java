@@ -48,45 +48,6 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
         blockProbabilities = createBlockProbabilities(config.blocks());
     }
 
-    public static SkyGridChunkGeneratorConfig getDefaultOverworldConfig() {
-        return new SkyGridChunkGeneratorConfig(
-                Arrays.asList(
-                        new BlockWeight(Blocks.STONE, 1.0)
-                ),
-                Arrays.asList(
-                        EntityType.ZOMBIE
-                )
-        );
-    }
-
-    public static SkyGridChunkGeneratorConfig getDefaultNetherConfig() {
-        return new SkyGridChunkGeneratorConfig(
-                Arrays.asList(
-                        new BlockWeight(Blocks.NETHERRACK, 1.0)
-                ),
-                Arrays.asList(
-                        EntityType.ZOMBIE
-                )
-        );
-    }
-
-    public static SkyGridChunkGeneratorConfig getDefaultEndConfig() {
-        return new SkyGridChunkGeneratorConfig(
-                Arrays.asList(
-                        new BlockWeight(Blocks.END_STONE, 1.0)
-                ),
-                Arrays.asList(
-                        EntityType.ZOMBIE
-                )
-        );
-    }
-
-    public static SkyGridChunkGeneratorConfig getDefaultConfigForModded() {
-        return new SkyGridChunkGeneratorConfig(
-                List.of(), List.of()
-        );
-    }
-
     private ProbabilityTable<Block> createBlockProbabilities(List<BlockWeight> blockWeights) {
         ProbabilityTable.Probability<Block>[] probabilities = new Probability[blockWeights.size()];
         for (int i = 0; i < blockWeights.size(); i++) {

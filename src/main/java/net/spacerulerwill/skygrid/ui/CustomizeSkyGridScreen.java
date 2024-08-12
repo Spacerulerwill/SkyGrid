@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.DrawContext;
@@ -68,9 +69,9 @@ public class CustomizeSkyGridScreen extends Screen {
         this.parent = parent;
         // Add initial dimension configs (default values for vanilla dimensions)
         dimensionChunkGeneratorConfigs = new HashMap<>();
-        dimensionChunkGeneratorConfigs.put(DimensionOptions.OVERWORLD, SkyGridChunkGenerator.getDefaultOverworldConfig());
-        dimensionChunkGeneratorConfigs.put(DimensionOptions.NETHER, SkyGridChunkGenerator.getDefaultNetherConfig());
-        dimensionChunkGeneratorConfigs.put(DimensionOptions.END, SkyGridChunkGenerator.getDefaultEndConfig());
+        dimensionChunkGeneratorConfigs.put(DimensionOptions.OVERWORLD, SkyGridChunkGeneratorConfig.getDefaultOverworldConfig());
+        dimensionChunkGeneratorConfigs.put(DimensionOptions.NETHER, SkyGridChunkGeneratorConfig.getDefaultNetherConfig());
+        dimensionChunkGeneratorConfigs.put(DimensionOptions.END, SkyGridChunkGeneratorConfig.getDefaultEndConfig());
         // Array of dimensions options registry keys
         currentDimension = DimensionOptions.OVERWORLD;
         dimensions.add(DimensionOptions.OVERWORLD);
@@ -78,7 +79,7 @@ public class CustomizeSkyGridScreen extends Screen {
         dimensions.add(DimensionOptions.END);
         parent.getWorldCreator().getGeneratorOptionsHolder().dimensionOptionsRegistry().getEntrySet().forEach(entry -> {
             dimensions.add(entry.getKey());
-            dimensionChunkGeneratorConfigs.put(entry.getKey(), SkyGridChunkGenerator.getDefaultConfigForModded());
+            dimensionChunkGeneratorConfigs.put(entry.getKey(), SkyGridChunkGeneratorConfig.getDefaultConfigForModded());
         });
     }
 
@@ -111,6 +112,7 @@ public class CustomizeSkyGridScreen extends Screen {
                 .values(dimensions)
                 .build(0, 0, 158, 20, Text.translatable("createWorld.customize.skygrid.button.dimension"), ((button, value) -> {
                     currentDimension = value;
+                    blockTab.widget.setScrollAmount(0.0);
                     blockTab.refreshWidget();
                 })));
         row2.add(ButtonWidget.builder(Text.translatable("createWorld.customize.skygrid.button.delete"), (button) -> {
@@ -265,22 +267,9 @@ public class CustomizeSkyGridScreen extends Screen {
             this.clearEntries();
             List<BlockWeight> blocks = CustomizeSkyGridScreen.this.getCurrentConfig().blocks();
             for(int i = 0; i < blocks.size(); ++i) {
-                BlockState blockState = blocks.get(i).block().getDefaultState();
-                ItemStack itemStack = createItemStackFor(blockState);
-                this.addEntry(new SkyGridWeightEntry(itemStack.getName()));
+                BlockWeight blockWeight = blocks.get(blocks.size() - i - 1);
+                this.addEntry(new SkyGridWeightEntry(blockWeight.weight(), blockWeight.block().getName()));
             }
-        }
-
-        private ItemStack createItemStackFor(BlockState state) {
-            Item item = state.getBlock().asItem();
-            if (item == Items.AIR) {
-                if (state.isOf(Blocks.WATER)) {
-                    item = Items.WATER_BUCKET;
-                } else if (state.isOf(Blocks.LAVA)) {
-                    item = Items.LAVA_BUCKET;
-                }
-            }
-            return new ItemStack(item);
         }
 
         @Override
@@ -294,15 +283,15 @@ public class CustomizeSkyGridScreen extends Screen {
         private class SkyGridWeightEntry extends AlwaysSelectedEntryListWidget.Entry<SkyGridWeightEntry> {
             private final WeightSliderWidget weightSliderWidget;
 
-            public SkyGridWeightEntry(Text name) {
-                this.weightSliderWidget = new WeightSliderWidget(0, 0, 193, 20, 0, 1000, 500, name); // Adjust width and height as needed
+            public SkyGridWeightEntry(double initialWeight, Text name) {
+                this.weightSliderWidget = new WeightSliderWidget(0, 0, 193, 20, 0, 1000, (int)initialWeight, name); // Adjust width and height as needed
             }
 
             public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
                 SkyGridChunkGeneratorConfig currentConfig = CustomizeSkyGridScreen.this.getCurrentConfig();
                 BlockWeight blockWeight = currentConfig.blocks().get(currentConfig.blocks().size() - index - 1);
                 BlockState blockState = blockWeight.block().getDefaultState();
-                ItemStack itemStack = SkyGridWeightListWidget.this.createItemStackFor(blockState);
+                ItemStack itemStack = this.createItemStackFor(blockState);
 
                 // Render the block icon and name
                 this.renderIcon(context, x, y, itemStack);
@@ -313,7 +302,17 @@ public class CustomizeSkyGridScreen extends Screen {
                 this.weightSliderWidget.render(context, mouseX, mouseY, tickDelta);
             }
 
-
+            private ItemStack createItemStackFor(BlockState state) {
+                Item item = state.getBlock().asItem();
+                if (item == Items.AIR) {
+                    if (state.isOf(Blocks.WATER)) {
+                        item = Items.WATER_BUCKET;
+                    } else if (state.isOf(Blocks.LAVA)) {
+                        item = Items.LAVA_BUCKET;
+                    }
+                }
+                return new ItemStack(item);
+            }
 
             private void renderIcon(DrawContext context, int x, int y, ItemStack iconItem) {
                 this.renderIconBackgroundTexture(context, x + 1, y + 1);
