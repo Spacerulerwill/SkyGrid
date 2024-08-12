@@ -21,6 +21,7 @@ import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.*;
 import net.minecraft.world.gen.noise.NoiseConfig;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -60,7 +61,7 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
     public static SkyGridChunkGeneratorConfig getDefaultNetherConfig() {
         return new SkyGridChunkGeneratorConfig(
                 Arrays.asList(
-                        new BlockWeight(Blocks.STONE, 1.0)
+                        new BlockWeight(Blocks.NETHERRACK, 1.0)
                 ),
                 Arrays.asList(
                         EntityType.ZOMBIE
@@ -71,11 +72,17 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
     public static SkyGridChunkGeneratorConfig getDefaultEndConfig() {
         return new SkyGridChunkGeneratorConfig(
                 Arrays.asList(
-                        new BlockWeight(Blocks.STONE, 1.0)
+                        new BlockWeight(Blocks.END_STONE, 1.0)
                 ),
                 Arrays.asList(
                         EntityType.ZOMBIE
                 )
+        );
+    }
+
+    public static SkyGridChunkGeneratorConfig getDefaultConfigForModded() {
+        return new SkyGridChunkGeneratorConfig(
+                List.of(), List.of()
         );
     }
 
