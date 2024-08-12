@@ -24,6 +24,7 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.ScreenTexts;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.biome.Biome;
@@ -37,6 +38,7 @@ import net.spacerulerwill.skygrid.util.BlockWeight;
 import net.spacerulerwill.skygrid.worldgen.SkyGridChunkGenerator;
 import net.spacerulerwill.skygrid.worldgen.SkyGridChunkGeneratorConfig;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Mutable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -227,17 +229,23 @@ public class CustomizeSkyGridScreen extends Screen {
     public class WeightSliderWidget extends SliderWidget {
         private final double minValue;
         private final double maxValue;
+        private final Text name;
 
-        public WeightSliderWidget(int x, int y, int width, int height, double minValue, double maxValue, double initialValue) {
+        public WeightSliderWidget(int x, int y, int width, int height, double minValue, double maxValue, double initialValue, Text name) {
             super(x, y, width, height, Text.literal("FOV: " + (int) initialValue), (initialValue - minValue) / (maxValue - minValue));
             this.minValue = minValue;
             this.maxValue = maxValue;
+            this.name = name;
             this.updateMessage();
         }
 
         @Override
         protected void updateMessage() {
-            this.setMessage(Text.literal("Weight: " + (int) (this.value * (this.maxValue - this.minValue) + this.minValue)));
+            int calculatedValue = (int) (this.value * (this.maxValue - this.minValue) + this.minValue);
+            MutableText message = name.copy()
+                    .append(Text.literal(": "))
+                    .append(Text.literal(String.valueOf(calculatedValue)));
+            this.setMessage(message);
         }
 
         @Override
@@ -255,9 +263,24 @@ public class CustomizeSkyGridScreen extends Screen {
 
         public void refresh() {
             this.clearEntries();
-            for(int i = 0; i < CustomizeSkyGridScreen.this.getCurrentConfig().blocks().size(); ++i) {
-                this.addEntry(new SkyGridWeightEntry());
+            List<BlockWeight> blocks = CustomizeSkyGridScreen.this.getCurrentConfig().blocks();
+            for(int i = 0; i < blocks.size(); ++i) {
+                BlockState blockState = blocks.get(i).block().getDefaultState();
+                ItemStack itemStack = createItemStackFor(blockState);
+                this.addEntry(new SkyGridWeightEntry(itemStack.getName()));
             }
+        }
+
+        private ItemStack createItemStackFor(BlockState state) {
+            Item item = state.getBlock().asItem();
+            if (item == Items.AIR) {
+                if (state.isOf(Blocks.WATER)) {
+                    item = Items.WATER_BUCKET;
+                } else if (state.isOf(Blocks.LAVA)) {
+                    item = Items.LAVA_BUCKET;
+                }
+            }
+            return new ItemStack(item);
         }
 
         @Override
@@ -271,37 +294,26 @@ public class CustomizeSkyGridScreen extends Screen {
         private class SkyGridWeightEntry extends AlwaysSelectedEntryListWidget.Entry<SkyGridWeightEntry> {
             private final WeightSliderWidget weightSliderWidget;
 
-            public SkyGridWeightEntry() {
-                this.weightSliderWidget = new WeightSliderWidget(0, 0, 162, 20, 0, 1000, 500); // Adjust width and height as needed
+            public SkyGridWeightEntry(Text name) {
+                this.weightSliderWidget = new WeightSliderWidget(0, 0, 193, 20, 0, 1000, 500, name); // Adjust width and height as needed
             }
 
             public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
                 SkyGridChunkGeneratorConfig currentConfig = CustomizeSkyGridScreen.this.getCurrentConfig();
                 BlockWeight blockWeight = currentConfig.blocks().get(currentConfig.blocks().size() - index - 1);
                 BlockState blockState = blockWeight.block().getDefaultState();
-                ItemStack itemStack = this.createItemStackFor(blockState);
+                ItemStack itemStack = SkyGridWeightListWidget.this.createItemStackFor(blockState);
 
                 // Render the block icon and name
                 this.renderIcon(context, x, y, itemStack);
-                context.drawText(CustomizeSkyGridScreen.this.textRenderer, itemStack.getName(), x + 18 + 5, y + 3, 16777215, false);
 
                 // Update slider position relative to the entry position
-                this.weightSliderWidget.setX(x + 53); // Adjust as needed
+                this.weightSliderWidget.setX(x + 22); // Adjust as needed
                 this.weightSliderWidget.setY(y); // Adjust as needed
                 this.weightSliderWidget.render(context, mouseX, mouseY, tickDelta);
             }
 
-            private ItemStack createItemStackFor(BlockState state) {
-                Item item = state.getBlock().asItem();
-                if (item == Items.AIR) {
-                    if (state.isOf(Blocks.WATER)) {
-                        item = Items.WATER_BUCKET;
-                    } else if (state.isOf(Blocks.LAVA)) {
-                        item = Items.LAVA_BUCKET;
-                    }
-                }
-                return new ItemStack(item);
-            }
+
 
             private void renderIcon(DrawContext context, int x, int y, ItemStack iconItem) {
                 this.renderIconBackgroundTexture(context, x + 1, y + 1);
