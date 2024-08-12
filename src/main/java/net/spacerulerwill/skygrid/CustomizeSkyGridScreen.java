@@ -1,9 +1,9 @@
 package net.spacerulerwill.skygrid;
 
 import com.google.common.collect.ImmutableMap;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.ScreenRect;
 import net.minecraft.client.gui.screen.Screen;
@@ -11,12 +11,11 @@ import net.minecraft.client.gui.screen.world.CreateWorldScreen;
 import net.minecraft.client.gui.tab.GridScreenTab;
 import net.minecraft.client.gui.tab.Tab;
 import net.minecraft.client.gui.tab.TabManager;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
-import net.minecraft.client.gui.widget.TabNavigationWidget;
-import net.minecraft.client.gui.widget.ThreePartsLayoutWidget;
+import net.minecraft.client.gui.widget.*;
 import net.minecraft.client.world.GeneratorOptionsHolder;
-import net.minecraft.registry.*;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
@@ -29,79 +28,133 @@ import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Environment(EnvType.CLIENT)
 public class CustomizeSkyGridScreen extends Screen {
-    // UI stuff
-    CreateWorldScreen parent;
+    // UI Stuff
+    protected final CreateWorldScreen parent;
     private final ThreePartsLayoutWidget layout = new ThreePartsLayoutWidget(this);
     private final TabManager tabManager = new TabManager(this::addDrawableChild, this::remove);
     @Nullable
     private TabNavigationWidget tabNavigation;
-    // Other stuff
-    private final Map<RegistryKey<DimensionOptions>, SkyGridChunkGeneratorConfig> dimensionChunkGeneratorConfigs;
+    private SkyGridWeightListWidget layers;
+    private BlockTab blockTab;
+    private MobSpawnerTab mobSpawnerTab;
 
-    public CustomizeSkyGridScreen(
-            CreateWorldScreen parent
-    ) {
+    // Other Stuff
+    private final Map<RegistryKey<DimensionOptions>, SkyGridChunkGeneratorConfig> dimensionChunkGeneratorConfigs;
+    List<RegistryKey<DimensionOptions>> dimensions = new ArrayList<>();
+    RegistryKey<DimensionOptions> currentDimension;
+
+    public CustomizeSkyGridScreen(CreateWorldScreen parent) {
         super(Text.translatable("createWorld.customize.skygrid.title"));
         this.parent = parent;
+        // Add initial dimension configs (default values for vanilla dimensions)
         dimensionChunkGeneratorConfigs = new HashMap<>();
         dimensionChunkGeneratorConfigs.put(DimensionOptions.OVERWORLD, SkyGridChunkGenerator.getDefaultOverworldConfig());
         dimensionChunkGeneratorConfigs.put(DimensionOptions.NETHER, SkyGridChunkGenerator.getDefaultNetherConfig());
         dimensionChunkGeneratorConfigs.put(DimensionOptions.END, SkyGridChunkGenerator.getDefaultEndConfig());
+        // Array of dimensions options registry keys
+        currentDimension = DimensionOptions.OVERWORLD;
+        dimensions.add(DimensionOptions.OVERWORLD);
+        dimensions.add(DimensionOptions.NETHER);
+        dimensions.add(DimensionOptions.END);
+        parent.getWorldCreator().getGeneratorOptionsHolder().dimensionOptionsRegistry().getEntrySet().forEach(entry -> {
+            dimensions.add(entry.getKey());
+        });
     }
 
     protected void init() {
-        DirectionalLayoutWidget directionalLayoutWidget = layout.addFooter(DirectionalLayoutWidget.horizontal().spacing(8));
-        // Add the Cancel and Done buttons
-        directionalLayoutWidget.add(ButtonWidget.builder(ScreenTexts.DONE, (button) -> {
-            applyConfigurations();
-            close();
-        }).build());
-        directionalLayoutWidget.add(ButtonWidget.builder(ScreenTexts.CANCEL, (button) -> {
-            close();
-        }).build());
-
+        //this.layers = layout.addBody(new SkyGridWeightListWidget());
+        blockTab = new BlockTab();
+        mobSpawnerTab = new MobSpawnerTab();
+        tabNavigation = TabNavigationWidget.builder(tabManager, width)
+                .tabs(new Tab[]{
+                        blockTab,
+                        mobSpawnerTab
+                }).build();
+        layout.setFooterHeight(80);
         layout.forEachChild((child) -> {
             child.setNavigationOrder(1);
             addDrawableChild(child);
         });
+        addDrawableChild(tabNavigation);
+
+        DirectionalLayoutWidget rows = layout.addFooter(DirectionalLayoutWidget.vertical().spacing(4));
+
+        DirectionalLayoutWidget row1 = DirectionalLayoutWidget.horizontal().spacing(8);
+        row1.add(new TextFieldWidget(textRenderer, 158, 20, Text.translatable("createWorld.customize.skygrid.enterBlock")));
+        row1.add(ButtonWidget.builder(Text.translatable("createWorld.customize.skygrid.button.add"), (button) -> {
+        }).width(75).build());
+
+
+        DirectionalLayoutWidget row2 = DirectionalLayoutWidget.horizontal().spacing(8);
+        row2.add(new CyclingButtonWidget.Builder<RegistryKey<DimensionOptions>>(value -> {
+            return Text.translatable(value.getValue().toTranslationKey());
+        })
+                .values(dimensions)
+                .build(0, 0, 158, 20, Text.translatable("createWorld.customize.skygrid.button.dimension"), ((button, value) -> {
+                    currentDimension = value;
+                })));
+        row2.add(ButtonWidget.builder(Text.translatable("createWorld.customize.skygrid.button.delete"), (button) -> {
+        }).width(75).build());
+
+        DirectionalLayoutWidget row3 = DirectionalLayoutWidget.horizontal().spacing(8);
+        row3.add(ButtonWidget.builder(ScreenTexts.DONE, (button) -> {
+            //applyConfigurations();
+            close();
+        }).width(75).build());
+        row3.add(ButtonWidget.builder(ScreenTexts.CANCEL, (button) -> {
+            close();
+        }).width(75).build());
+        row3.add(ButtonWidget.builder(Text.translatable("createWorld.customize.skygrid.button.presets"), (button) -> {
+        }).width(75).build());
+
+        // Add rows to the main layout
+        rows.add(row1);
+        rows.add(row2);
+        rows.add(row3);
+
+        layout.setFooterHeight(80);
+        layout.forEachChild((child) -> {
+            child.setNavigationOrder(1);
+            addDrawableChild(child);
+        });
+
+        // Initialize tab navigation
         initTabNavigation();
     }
 
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
-        RenderSystem.enableBlend();
-        context.drawTexture(Screen.FOOTER_SEPARATOR_TEXTURE, 0, height - layout.getFooterHeight() - 2, 0.0F, 0.0F, width, 2, 32, 2);
-        RenderSystem.disableBlend();
-    }
-
     public void initTabNavigation() {
-        tabNavigation = TabNavigationWidget.builder(tabManager, width)
-                .tabs(new Tab[]{
-                        new BlockTab(),
-                        new MobSpawnerTab(),
-                }).build();
-        addDrawableChild(tabNavigation);
+        blockTab.resize();
+        mobSpawnerTab.resize();
+
         if (tabNavigation != null) {
             tabNavigation.selectTab(0, false);
             tabNavigation.setWidth(width);
             tabNavigation.init();
             int i = tabNavigation.getNavigationFocus().getBottom();
-            ScreenRect screenRect = new ScreenRect(0, i, width, height - layout.getFooterHeight() - i);
+            ScreenRect screenRect = new ScreenRect(0, i+3, width, height - layout.getFooterHeight() - i);
             tabManager.setTabArea(screenRect);
             layout.setHeaderHeight(i);
             layout.refreshPositions();
         }
     }
 
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.render(context, mouseX, mouseY, delta);
+
+        RenderSystem.enableBlend();
+        context.drawTexture(Screen.FOOTER_SEPARATOR_TEXTURE, 0, height - layout.getFooterHeight() - 2, 0.0F, 0.0F, width, 2, 32, 2);
+        RenderSystem.disableBlend();
+    }
+
     public void close() {
-        client.setScreen(parent);
+        this.client.setScreen(this.parent);
     }
 
     // Method to apply the configurations to respective chunk generators
@@ -127,7 +180,6 @@ public class CustomizeSkyGridScreen extends Screen {
                 RegistryEntry<DimensionType> dimensionTypeRegistryEntry = dimensionOptions.dimensionTypeEntry();
                 DimensionOptions newDimensionOptions = new DimensionOptions(dimensionTypeRegistryEntry, chunkGenerator);
                 updatedDimensions.put(dimensionOptionsRegistryKey, newDimensionOptions);
-
             });
 
             // Return as an immutable map
@@ -137,15 +189,50 @@ public class CustomizeSkyGridScreen extends Screen {
 
     @Environment(EnvType.CLIENT)
     private class BlockTab extends GridScreenTab {
+        public SkyGridWeightListWidget widget;
         public BlockTab() {
             super(Text.translatable("createWorld.customize.skygrid.tab.block"));
+            GridWidget.Adder adder = this.grid.setRowSpacing(8).createAdder(1);
+            Positioner positioner = adder.copyPositioner();
+            widget = adder.add(new SkyGridWeightListWidget(), positioner);
+        }
+
+        public void resize() {
+            widget.setWidth(CustomizeSkyGridScreen.this.width);
+            widget.setHeight(CustomizeSkyGridScreen.this.height - 117);
         }
     }
 
     @Environment(EnvType.CLIENT)
     private class MobSpawnerTab extends GridScreenTab {
+        public SkyGridWeightListWidget widget;
         public MobSpawnerTab() {
             super(Text.translatable("createWorld.customize.skygrid.tab.mob_spawner"));
+            GridWidget.Adder adder = this.grid.setRowSpacing(8).createAdder(1);
+            Positioner positioner = adder.copyPositioner();
+            widget = adder.add(new SkyGridWeightListWidget(), positioner);
+        }
+
+        public void resize() {
+            widget.setWidth(CustomizeSkyGridScreen.this.width);
+            widget.setHeight(CustomizeSkyGridScreen.this.height - 117);
+        }
+    }
+
+    @Environment(EnvType.CLIENT)
+    private class SkyGridWeightListWidget extends AlwaysSelectedEntryListWidget<CustomizeSkyGridScreen.SkyGridWeightListWidget.SkyGridWeightEntry> {
+        public SkyGridWeightListWidget() {
+            super(CustomizeSkyGridScreen.this.client, CustomizeSkyGridScreen.this.width, CustomizeSkyGridScreen.this.height - 117, 43, 24);
+        }
+
+        @Environment(EnvType.CLIENT)
+        private class SkyGridWeightEntry extends AlwaysSelectedEntryListWidget.Entry<SkyGridWeightEntry> {
+            public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+            }
+
+            public Text getNarration() {
+                return null;
+            }
         }
     }
 }
