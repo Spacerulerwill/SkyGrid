@@ -1,4 +1,4 @@
-package net.spacerulerwill.skygrid;
+package net.spacerulerwill.skygrid.ui;
 
 import com.google.common.collect.ImmutableMap;
 import net.fabricmc.api.EnvType;
@@ -7,17 +7,14 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.client.gui.ScreenRect;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.option.OptionsScreen;
-import net.minecraft.client.gui.screen.option.VideoOptionsScreen;
 import net.minecraft.client.gui.screen.world.CreateWorldScreen;
-import net.minecraft.client.gui.screen.world.CustomizeFlatLevelScreen;
 import net.minecraft.client.gui.tab.GridScreenTab;
 import net.minecraft.client.gui.tab.Tab;
 import net.minecraft.client.gui.tab.TabManager;
 import net.minecraft.client.gui.widget.*;
-import net.minecraft.client.option.SimpleOption;
 import net.minecraft.client.world.GeneratorOptionsHolder;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -36,6 +33,9 @@ import net.minecraft.world.dimension.DimensionOptions;
 import net.minecraft.world.dimension.DimensionOptionsRegistryHolder;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.spacerulerwill.skygrid.util.BlockWeight;
+import net.spacerulerwill.skygrid.worldgen.SkyGridChunkGenerator;
+import net.spacerulerwill.skygrid.worldgen.SkyGridChunkGeneratorConfig;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -224,6 +224,28 @@ public class CustomizeSkyGridScreen extends Screen {
         }
     }
 
+    public class WeightSliderWidget extends SliderWidget {
+        private final double minValue;
+        private final double maxValue;
+
+        public WeightSliderWidget(int x, int y, int width, int height, double minValue, double maxValue, double initialValue) {
+            super(x, y, width, height, Text.literal("FOV: " + (int) initialValue), (initialValue - minValue) / (maxValue - minValue));
+            this.minValue = minValue;
+            this.maxValue = maxValue;
+            this.updateMessage();
+        }
+
+        @Override
+        protected void updateMessage() {
+            this.setMessage(Text.literal("Weight: " + (int) (this.value * (this.maxValue - this.minValue) + this.minValue)));
+        }
+
+        @Override
+        protected void applyValue() {
+            double weight = this.value * (this.maxValue - this.minValue) + this.minValue;
+        }
+    }
+
     @Environment(EnvType.CLIENT)
     private class SkyGridWeightListWidget extends AlwaysSelectedEntryListWidget<CustomizeSkyGridScreen.SkyGridWeightListWidget.SkyGridWeightEntry> {
         public SkyGridWeightListWidget() {
@@ -247,13 +269,26 @@ public class CustomizeSkyGridScreen extends Screen {
 
         @Environment(EnvType.CLIENT)
         private class SkyGridWeightEntry extends AlwaysSelectedEntryListWidget.Entry<SkyGridWeightEntry> {
+            private final WeightSliderWidget weightSliderWidget;
+
+            public SkyGridWeightEntry() {
+                this.weightSliderWidget = new WeightSliderWidget(0, 0, 162, 20, 0, 1000, 500); // Adjust width and height as needed
+            }
+
             public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
                 SkyGridChunkGeneratorConfig currentConfig = CustomizeSkyGridScreen.this.getCurrentConfig();
                 BlockWeight blockWeight = currentConfig.blocks().get(currentConfig.blocks().size() - index - 1);
                 BlockState blockState = blockWeight.block().getDefaultState();
                 ItemStack itemStack = this.createItemStackFor(blockState);
+
+                // Render the block icon and name
                 this.renderIcon(context, x, y, itemStack);
                 context.drawText(CustomizeSkyGridScreen.this.textRenderer, itemStack.getName(), x + 18 + 5, y + 3, 16777215, false);
+
+                // Update slider position relative to the entry position
+                this.weightSliderWidget.setX(x + 53); // Adjust as needed
+                this.weightSliderWidget.setY(y); // Adjust as needed
+                this.weightSliderWidget.render(context, mouseX, mouseY, tickDelta);
             }
 
             private ItemStack createItemStackFor(BlockState state) {

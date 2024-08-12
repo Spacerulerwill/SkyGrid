@@ -1,4 +1,4 @@
-package net.spacerulerwill.skygrid;
+package net.spacerulerwill.skygrid.worldgen;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -21,12 +21,13 @@ import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.*;
 import net.minecraft.world.gen.noise.NoiseConfig;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import net.spacerulerwill.skygrid.ProbabilityTable.Probability;
+import net.spacerulerwill.skygrid.util.BlockWeight;
+import net.spacerulerwill.skygrid.util.ProbabilityTable;
+import net.spacerulerwill.skygrid.util.ProbabilityTable.Probability;
 
 public class SkyGridChunkGenerator extends ChunkGenerator {
     public static final MapCodec<SkyGridChunkGenerator> MAP_CODEC = RecordCodecBuilder.mapCodec(instance ->

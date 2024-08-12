@@ -1,4 +1,4 @@
-package net.spacerulerwill.skygrid;
+package net.spacerulerwill.skygrid.util;
 
 import net.minecraft.util.math.random.Random;
 
@@ -7,7 +7,7 @@ public class ProbabilityTable<T> {
         T object;
         double weight;
 
-        Probability(T block, double weight) {
+        public Probability(T block, double weight) {
             this.object = block;
             this.weight = weight;
         }
@@ -15,7 +15,7 @@ public class ProbabilityTable<T> {
 
     private final Probability<T>[] probabilities;
 
-    ProbabilityTable(Probability<T>[] probabilities) {
+    public ProbabilityTable(Probability<T>[] probabilities) {
         this.probabilities = probabilities;
 
         // Calculate total weights

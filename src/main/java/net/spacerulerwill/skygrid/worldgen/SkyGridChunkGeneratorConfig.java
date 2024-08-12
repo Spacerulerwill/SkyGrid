@@ -1,9 +1,10 @@
-package net.spacerulerwill.skygrid;
+package net.spacerulerwill.skygrid.worldgen;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.entity.EntityType;
 import net.minecraft.registry.Registries;
+import net.spacerulerwill.skygrid.util.BlockWeight;
 
 import java.util.List;
 
