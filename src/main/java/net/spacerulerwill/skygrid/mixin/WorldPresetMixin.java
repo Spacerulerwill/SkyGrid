@@ -9,6 +9,10 @@ import org.spongepowered.asm.mixin.Shadow;
 import java.util.Map;
 import java.util.Optional;
 
+/*
+This mixin provides two methods for getting the default nether and end generation options.
+There was already one implemented for the overworld, but I needed these 2 also.
+ */
 @Mixin(WorldPreset.class)
 public class WorldPresetMixin implements WorldPresetExtension {
     @Shadow
