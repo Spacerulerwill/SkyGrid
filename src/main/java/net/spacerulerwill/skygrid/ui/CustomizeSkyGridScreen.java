@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.fabricmc.fabric.mixin.registry.sync.RegistriesAccessor;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -20,6 +21,7 @@ import net.minecraft.client.world.GeneratorOptionsHolder;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
@@ -35,16 +37,11 @@ import net.minecraft.world.dimension.DimensionOptions;
 import net.minecraft.world.dimension.DimensionOptionsRegistryHolder;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.spacerulerwill.skygrid.util.BlockWeight;
 import net.spacerulerwill.skygrid.worldgen.SkyGridChunkGenerator;
 import net.spacerulerwill.skygrid.worldgen.SkyGridChunkGeneratorConfig;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Mutable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Environment(EnvType.CLIENT)
 public class CustomizeSkyGridScreen extends Screen {
@@ -178,20 +175,17 @@ public class CustomizeSkyGridScreen extends Screen {
 
     private GeneratorOptionsHolder.RegistryAwareModifier createModifier() {
         return (dynamicRegistryManager, dimensionsRegistryHolder) -> {
-            // We must create an ENTIRELY NEW dimension options map to replace it because it is immutable... :(
-            // Get our registries from the dynamic registry manager
             Registry<Biome> biomeRegistry = dynamicRegistryManager.get(RegistryKeys.BIOME);
             RegistryEntry<Biome> biomeEntry = biomeRegistry.entryOf(BiomeKeys.THE_VOID);
 
-            // New map
             Map<RegistryKey<DimensionOptions>, DimensionOptions> updatedDimensions = new HashMap<>(dimensionsRegistryHolder.dimensions());
 
             dimensionChunkGeneratorConfigs.forEach((dimensionOptionsRegistryKey, config) -> {
-                // If the config contains no blocks, use vanilla generation
-                if (!config.blocks().isEmpty()) {
-                    // new chunk generator
+                boolean hasNonZeroBlock = config.blocks().values().stream().anyMatch(weight -> weight > 0);
+
+                if (hasNonZeroBlock) {
+                    System.out.println(dimensionOptionsRegistryKey);
                     ChunkGenerator chunkGenerator = new SkyGridChunkGenerator(new FixedBiomeSource(biomeEntry), config);
-                    // Get the dimension type from the dimension option registry and create new dimension options and update in the map
                     DimensionOptions dimensionOptions = parent.getWorldCreator().getGeneratorOptionsHolder().selectedDimensions().dimensions().get(dimensionOptionsRegistryKey);
                     RegistryEntry<DimensionType> dimensionTypeRegistryEntry = dimensionOptions.dimensionTypeEntry();
                     DimensionOptions newDimensionOptions = new DimensionOptions(dimensionTypeRegistryEntry, chunkGenerator);
@@ -199,10 +193,10 @@ public class CustomizeSkyGridScreen extends Screen {
                 }
             });
 
-            // Return as an immutable map
             return new DimensionOptionsRegistryHolder(ImmutableMap.copyOf(updatedDimensions));
         };
     }
+
 
     private SkyGridChunkGeneratorConfig getCurrentConfig() {
         return dimensionChunkGeneratorConfigs.get(currentDimension);
@@ -229,15 +223,17 @@ public class CustomizeSkyGridScreen extends Screen {
     }
 
     public class WeightSliderWidget extends SliderWidget {
-        private final double minValue;
-        private final double maxValue;
+        private final int minValue;
+        private final int maxValue;
         private final Text name;
+        private final Block block;
 
-        public WeightSliderWidget(int x, int y, int width, int height, double minValue, double maxValue, double initialValue, Text name) {
+        public WeightSliderWidget(int x, int y, int width, int height, int minValue, int maxValue, Block block, double initialValue, Text name) {
             super(x, y, width, height, Text.literal("FOV: " + (int) initialValue), (initialValue - minValue) / (maxValue - minValue));
             this.minValue = minValue;
             this.maxValue = maxValue;
             this.name = name;
+            this.block = block;
             this.updateMessage();
         }
 
@@ -252,8 +248,9 @@ public class CustomizeSkyGridScreen extends Screen {
 
         @Override
         protected void applyValue() {
-            double weight = this.value * (this.maxValue - this.minValue) + this.minValue;
-
+            int weight = (int)(this.value * (this.maxValue - this.minValue) + this.minValue);
+            SkyGridChunkGeneratorConfig currentConfig = CustomizeSkyGridScreen.this.getCurrentConfig();
+            currentConfig.blocks().put(block, weight);
         }
     }
 
@@ -266,10 +263,9 @@ public class CustomizeSkyGridScreen extends Screen {
 
         public void refresh() {
             this.clearEntries();
-            List<BlockWeight> blocks = CustomizeSkyGridScreen.this.getCurrentConfig().blocks();
-            for(int i = 0; i < blocks.size(); ++i) {
-                BlockWeight blockWeight = blocks.get(i);
-                this.addEntry(new SkyGridWeightEntry(blockWeight.weight(), blockWeight.block().getName()));
+            LinkedHashMap<Block, Integer> blocks = CustomizeSkyGridScreen.this.getCurrentConfig().blocks();
+            for (Map.Entry<Block, Integer> entry : blocks.entrySet()) {
+                this.addEntry(new SkyGridWeightEntry(entry.getKey(), entry.getValue(), entry.getKey().getName()));
             }
         }
 
@@ -283,15 +279,15 @@ public class CustomizeSkyGridScreen extends Screen {
         @Environment(EnvType.CLIENT)
         private class SkyGridWeightEntry extends AlwaysSelectedEntryListWidget.Entry<SkyGridWeightEntry> {
             private final WeightSliderWidget weightSliderWidget;
+            private final Block block;
 
-            public SkyGridWeightEntry(double initialWeight, Text name) {
-                this.weightSliderWidget = new WeightSliderWidget(0, 0, 193, 20, 0, 1000, (int)initialWeight, name); // Adjust width and height as needed
+            public SkyGridWeightEntry(Block block, double initialWeight, Text name) {
+                this.block = block;
+                this.weightSliderWidget = new WeightSliderWidget(0, 0, 193, 20, 0, 500, block, (int)initialWeight, name); // Adjust width and height as needed
             }
 
             public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-                SkyGridChunkGeneratorConfig currentConfig = CustomizeSkyGridScreen.this.getCurrentConfig();
-                BlockWeight blockWeight = currentConfig.blocks().get(index);
-                BlockState blockState = blockWeight.block().getDefaultState();
+                BlockState blockState = block.getDefaultState();
                 ItemStack itemStack = createItemStackFor(blockState);
 
                 // Render the block icon and name

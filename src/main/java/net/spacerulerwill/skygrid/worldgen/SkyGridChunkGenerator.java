@@ -7,6 +7,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.MobSpawnerBlockEntity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.ChunkRegion;
@@ -16,13 +17,13 @@ import net.minecraft.world.StructureWorldAccess;
 import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.dimension.DimensionOptions;
 import net.minecraft.world.gen.GenerationStep;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.*;
 import net.minecraft.world.gen.noise.NoiseConfig;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 import net.spacerulerwill.skygrid.util.BlockWeight;
@@ -48,14 +49,15 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
         blockProbabilities = createBlockProbabilities(config.blocks());
     }
 
-    private ProbabilityTable<Block> createBlockProbabilities(List<BlockWeight> blockWeights) {
-        ProbabilityTable.Probability<Block>[] probabilities = new Probability[blockWeights.size()];
-        for (int i = 0; i < blockWeights.size(); i++) {
-            BlockWeight blockWeight = blockWeights.get(i);
-            probabilities[i] = new ProbabilityTable.Probability<>(blockWeight.block(), blockWeight.weight());
+    private ProbabilityTable<Block> createBlockProbabilities(LinkedHashMap<Block, Integer> blockWeights) {
+        ArrayList<Probability<Block>> probabilities = new ArrayList<>();
+        probabilities.ensureCapacity(blockWeights.size());
+        for (Map.Entry<Block, Integer> entry : blockWeights.entrySet()) {
+            probabilities.add(new ProbabilityTable.Probability<>(entry.getKey(), entry.getValue()));
         }
         return new ProbabilityTable<>(probabilities);
     }
+
 
     // Seed the random number generator with a hash function based on the column x and z
     private void seedRandomForColumn(int x, int z) {

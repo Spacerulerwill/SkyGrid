@@ -2,6 +2,8 @@ package net.spacerulerwill.skygrid.util;
 
 import net.minecraft.util.math.random.Random;
 
+import java.util.ArrayList;
+
 public class ProbabilityTable<T> {
     public static final class Probability<T> {
         T object;
@@ -13,9 +15,9 @@ public class ProbabilityTable<T> {
         }
     }
 
-    private final Probability<T>[] probabilities;
+    private final ArrayList<Probability<T>> probabilities;
 
-    public ProbabilityTable(Probability<T>[] probabilities) {
+    public ProbabilityTable(ArrayList<Probability<T>> probabilities) {
         this.probabilities = probabilities;
 
         // Calculate total weights
@@ -40,7 +42,6 @@ public class ProbabilityTable<T> {
                 return probability.object;
             }
         }
-        return probabilities[probabilities.length-1].object;
+        return probabilities.getLast().object;
     }
-
 }
