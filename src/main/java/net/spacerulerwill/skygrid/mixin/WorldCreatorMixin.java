@@ -14,6 +14,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(WorldCreator.class)
 public class WorldCreatorMixin {
+    /*
+    This mixin allows the customize button for our skygrid world preset in the world creation menu to open
+    our CustomizeSkyGridScreen
+     */
     @Inject(method = "getLevelScreenProvider", at = @At("HEAD"), cancellable = true)
     private void injected(CallbackInfoReturnable<LevelScreenProvider> cir) {
         RegistryEntry<WorldPreset> registryEntry = ((WorldCreator)(Object)this).getWorldType().preset();

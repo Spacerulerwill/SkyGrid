@@ -3,9 +3,11 @@
   "minVersion": "0.8",
   "package": "net.spacerulerwill.skygrid.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [],
+  "mixins": [
+  ],
   "client": [
-    "WorldCreatorMixin"
+    "WorldCreatorMixin",
+    "WorldPresetMixin"
   ],
   "server": [],
   "injectors": {

@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableMap;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.fabricmc.fabric.mixin.registry.sync.RegistriesAccessor;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -21,7 +20,6 @@ import net.minecraft.client.world.GeneratorOptionsHolder;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
@@ -36,12 +34,16 @@ import net.minecraft.world.biome.source.FixedBiomeSource;
 import net.minecraft.world.dimension.DimensionOptions;
 import net.minecraft.world.dimension.DimensionOptionsRegistryHolder;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.gen.WorldPreset;
+import net.minecraft.world.gen.WorldPresets;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.spacerulerwill.skygrid.util.WorldPresetExtension;
 import net.spacerulerwill.skygrid.worldgen.SkyGridChunkGenerator;
 import net.spacerulerwill.skygrid.worldgen.SkyGridChunkGeneratorConfig;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.List;
 
 @Environment(EnvType.CLIENT)
 public class CustomizeSkyGridScreen extends Screen {
@@ -190,9 +192,30 @@ public class CustomizeSkyGridScreen extends Screen {
                     RegistryEntry<DimensionType> dimensionTypeRegistryEntry = dimensionOptions.dimensionTypeEntry();
                     DimensionOptions newDimensionOptions = new DimensionOptions(dimensionTypeRegistryEntry, chunkGenerator);
                     updatedDimensions.put(dimensionOptionsRegistryKey, newDimensionOptions);
+                } else {
+                    /*
+                    There is no non-zero weighted block, so we must use default generation for this dimension. If it's
+                    a vanilla dimension we must get it from a registry due to the fact that the default is overwritten by
+                    our world preset json file. However for modded dimensions, we can leave it as they will have not
+                    been overwritten by our world preset json
+                     */
+                    if (dimensionOptionsRegistryKey == DimensionOptions.OVERWORLD) {
+                        DimensionOptions defaultOverworld = (dynamicRegistryManager.get(RegistryKeys.WORLD_PRESET).entryOf(WorldPresets.DEFAULT).value()).getOverworld().orElseThrow();
+                        updatedDimensions.put(dimensionOptionsRegistryKey, defaultOverworld);
+                    }
+                    else if (dimensionOptionsRegistryKey == DimensionOptions.NETHER) {
+                        WorldPreset preset = (dynamicRegistryManager.get(RegistryKeys.WORLD_PRESET).entryOf(WorldPresets.DEFAULT).value());
+                        DimensionOptions defaultNether = ((WorldPresetExtension)preset).skygrid$GetNether().orElseThrow();
+                        updatedDimensions.put(dimensionOptionsRegistryKey, defaultNether);
+                    }
+                    else if (dimensionOptionsRegistryKey == DimensionOptions.END) {
+                        WorldPreset preset = (dynamicRegistryManager.get(RegistryKeys.WORLD_PRESET).entryOf(WorldPresets.DEFAULT).value());
+                        DimensionOptions defaultEnd = ((WorldPresetExtension)preset).skygrid$GetEnd().orElseThrow();
+                        updatedDimensions.put(dimensionOptionsRegistryKey, defaultEnd);
+                    }
+
                 }
             });
-
             return new DimensionOptionsRegistryHolder(ImmutableMap.copyOf(updatedDimensions));
         };
     }
