@@ -186,7 +186,6 @@ public class CustomizeSkyGridScreen extends Screen {
                 boolean hasNonZeroBlock = config.blocks().values().stream().anyMatch(weight -> weight > 0);
 
                 if (hasNonZeroBlock) {
-                    System.out.println(dimensionOptionsRegistryKey);
                     ChunkGenerator chunkGenerator = new SkyGridChunkGenerator(new FixedBiomeSource(biomeEntry), config);
                     DimensionOptions dimensionOptions = parent.getWorldCreator().getGeneratorOptionsHolder().selectedDimensions().dimensions().get(dimensionOptionsRegistryKey);
                     RegistryEntry<DimensionType> dimensionTypeRegistryEntry = dimensionOptions.dimensionTypeEntry();
