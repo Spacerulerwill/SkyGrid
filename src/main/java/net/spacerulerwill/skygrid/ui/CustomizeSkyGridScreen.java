@@ -253,6 +253,7 @@ public class CustomizeSkyGridScreen extends Screen {
         @Override
         protected void applyValue() {
             double weight = this.value * (this.maxValue - this.minValue) + this.minValue;
+
         }
     }
 
@@ -267,7 +268,7 @@ public class CustomizeSkyGridScreen extends Screen {
             this.clearEntries();
             List<BlockWeight> blocks = CustomizeSkyGridScreen.this.getCurrentConfig().blocks();
             for(int i = 0; i < blocks.size(); ++i) {
-                BlockWeight blockWeight = blocks.get(blocks.size() - i - 1);
+                BlockWeight blockWeight = blocks.get(i);
                 this.addEntry(new SkyGridWeightEntry(blockWeight.weight(), blockWeight.block().getName()));
             }
         }
@@ -289,9 +290,9 @@ public class CustomizeSkyGridScreen extends Screen {
 
             public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
                 SkyGridChunkGeneratorConfig currentConfig = CustomizeSkyGridScreen.this.getCurrentConfig();
-                BlockWeight blockWeight = currentConfig.blocks().get(currentConfig.blocks().size() - index - 1);
+                BlockWeight blockWeight = currentConfig.blocks().get(index);
                 BlockState blockState = blockWeight.block().getDefaultState();
-                ItemStack itemStack = this.createItemStackFor(blockState);
+                ItemStack itemStack = createItemStackFor(blockState);
 
                 // Render the block icon and name
                 this.renderIcon(context, x, y, itemStack);
@@ -328,6 +329,33 @@ public class CustomizeSkyGridScreen extends Screen {
 
             public Text getNarration() {
                 return Text.of("test");
+            }
+
+            // Override mouseClicked to forward the event to the slider
+            @Override
+            public boolean mouseClicked(double mouseX, double mouseY, int button) {
+                if (weightSliderWidget.isMouseOver(mouseX, mouseY)) {
+                    return weightSliderWidget.mouseClicked(mouseX, mouseY, button);
+                }
+                return super.mouseClicked(mouseX, mouseY, button);
+            }
+
+            // Override mouseDragged to forward the event to the slider
+            @Override
+            public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+                if (weightSliderWidget.isMouseOver(mouseX, mouseY)) {
+                    return weightSliderWidget.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+                }
+                return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+            }
+
+            // Override mouseReleased to forward the event to the slider
+            @Override
+            public boolean mouseReleased(double mouseX, double mouseY, int button) {
+                if (weightSliderWidget.isMouseOver(mouseX, mouseY)) {
+                    return weightSliderWidget.mouseReleased(mouseX, mouseY, button);
+                }
+                return super.mouseReleased(mouseX, mouseY, button);
             }
         }
     }
