@@ -151,7 +151,7 @@ public class CustomizeSkyGridScreen extends Screen {
             tabNavigation.setWidth(width);
             tabNavigation.init();
             int i = tabNavigation.getNavigationFocus().getBottom();
-            ScreenRect screenRect = new ScreenRect(0, i+3, width, height - layout.getFooterHeight() - i);
+            ScreenRect screenRect = new ScreenRect(0, i + 3, width, height - layout.getFooterHeight() - i);
             tabManager.setTabArea(screenRect);
             layout.setHeaderHeight(i);
             layout.refreshPositions();
@@ -202,15 +202,13 @@ public class CustomizeSkyGridScreen extends Screen {
                     if (dimensionOptionsRegistryKey == DimensionOptions.OVERWORLD) {
                         DimensionOptions defaultOverworld = (dynamicRegistryManager.get(RegistryKeys.WORLD_PRESET).entryOf(WorldPresets.DEFAULT).value()).getOverworld().orElseThrow();
                         updatedDimensions.put(dimensionOptionsRegistryKey, defaultOverworld);
-                    }
-                    else if (dimensionOptionsRegistryKey == DimensionOptions.NETHER) {
+                    } else if (dimensionOptionsRegistryKey == DimensionOptions.NETHER) {
                         WorldPreset preset = (dynamicRegistryManager.get(RegistryKeys.WORLD_PRESET).entryOf(WorldPresets.DEFAULT).value());
-                        DimensionOptions defaultNether = ((WorldPresetExtension)preset).skygrid$GetNether().orElseThrow();
+                        DimensionOptions defaultNether = ((WorldPresetExtension) preset).skygrid$GetNether().orElseThrow();
                         updatedDimensions.put(dimensionOptionsRegistryKey, defaultNether);
-                    }
-                    else if (dimensionOptionsRegistryKey == DimensionOptions.END) {
+                    } else if (dimensionOptionsRegistryKey == DimensionOptions.END) {
                         WorldPreset preset = (dynamicRegistryManager.get(RegistryKeys.WORLD_PRESET).entryOf(WorldPresets.DEFAULT).value());
-                        DimensionOptions defaultEnd = ((WorldPresetExtension)preset).skygrid$GetEnd().orElseThrow();
+                        DimensionOptions defaultEnd = ((WorldPresetExtension) preset).skygrid$GetEnd().orElseThrow();
                         updatedDimensions.put(dimensionOptionsRegistryKey, defaultEnd);
                     }
 
@@ -228,6 +226,7 @@ public class CustomizeSkyGridScreen extends Screen {
     @Environment(EnvType.CLIENT)
     private class BlockTab extends GridScreenTab {
         public SkyGridWeightListWidget widget;
+
         public BlockTab() {
             super(Text.translatable("createWorld.customize.skygrid.tab.block"));
             GridWidget.Adder adder = this.grid.setRowSpacing(8).createAdder(1);
@@ -271,7 +270,7 @@ public class CustomizeSkyGridScreen extends Screen {
 
         @Override
         protected void applyValue() {
-            int weight = (int)(this.value * (this.maxValue - this.minValue) + this.minValue);
+            int weight = (int) (this.value * (this.maxValue - this.minValue) + this.minValue);
             SkyGridChunkGeneratorConfig currentConfig = CustomizeSkyGridScreen.this.getCurrentConfig();
             currentConfig.blocks().put(block, weight);
         }
@@ -306,7 +305,7 @@ public class CustomizeSkyGridScreen extends Screen {
 
             public SkyGridWeightEntry(Block block, double initialWeight, Text name) {
                 this.block = block;
-                this.weightSliderWidget = new WeightSliderWidget(0, 0, 193, 20, 0, 500, block, (int)initialWeight, name); // Adjust width and height as needed
+                this.weightSliderWidget = new WeightSliderWidget(0, 0, 193, 20, 0, 500, block, (int) initialWeight, name); // Adjust width and height as needed
             }
 
             public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {

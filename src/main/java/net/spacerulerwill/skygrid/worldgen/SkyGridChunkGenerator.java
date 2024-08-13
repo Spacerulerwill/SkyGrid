@@ -6,8 +6,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.MobSpawnerBlockEntity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.ChunkRegion;
@@ -17,7 +15,6 @@ import net.minecraft.world.StructureWorldAccess;
 import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.dimension.DimensionOptions;
 import net.minecraft.world.gen.GenerationStep;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.*;
@@ -26,7 +23,6 @@ import net.minecraft.world.gen.noise.NoiseConfig;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
-import net.spacerulerwill.skygrid.util.BlockWeight;
 import net.spacerulerwill.skygrid.util.ProbabilityTable;
 import net.spacerulerwill.skygrid.util.ProbabilityTable.Probability;
 
@@ -124,7 +120,7 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
                 int worldX = chunk.getPos().x * 16 + x;
                 int worldZ = chunk.getPos().z * 16 + z;
                 seedRandomForColumn(worldX, worldZ);
-                for (int y = getMinimumY(); y <= getMinimumY() + getWorldHeight(); y += 4) {
+                for (int y = getMinimumY(); y < getMinimumY() + getWorldHeight(); y += 4) {
                     BlockPos blockPos = new BlockPos(x, y, z);
                     Block block = blockProbabilities.pickRandom(random);
                     chunk.setBlockState(blockPos, block.getDefaultState(), false);

@@ -20,7 +20,7 @@ public class WorldCreatorMixin {
      */
     @Inject(method = "getLevelScreenProvider", at = @At("HEAD"), cancellable = true)
     private void injected(CallbackInfoReturnable<LevelScreenProvider> cir) {
-        RegistryEntry<WorldPreset> registryEntry = ((WorldCreator)(Object)this).getWorldType().preset();
+        RegistryEntry<WorldPreset> registryEntry = ((WorldCreator) (Object) this).getWorldType().preset();
         if (registryEntry != null && registryEntry.matchesId(Identifier.of(SkyGrid.MOD_ID, "skygrid"))) {
             cir.setReturnValue((parent, generatorOptionsHolder) ->
                     new CustomizeSkyGridScreen(parent));
