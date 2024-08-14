@@ -34,7 +34,6 @@ import net.spacerulerwill.skygrid.worldgen.SkyGridChunkGeneratorConfig;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -73,10 +72,6 @@ public class CustomizeSkyGridScreen extends Screen {
         this.dimensions.add(DimensionOptions.OVERWORLD);
         this.dimensions.add(DimensionOptions.NETHER);
         this.dimensions.add(DimensionOptions.END);
-        parent.getWorldCreator().getGeneratorOptionsHolder().dimensionOptionsRegistry().getEntrySet().forEach(entry -> {
-            this.dimensions.add(entry.getKey());
-            this.dimensionChunkGeneratorConfigs.put(entry.getKey(), SkyGridChunkGeneratorConfig.getDefaultConfigForModded());
-        });
     }
 
     private void onTabLoad(ClickableWidget widget) {
@@ -216,16 +211,8 @@ public class CustomizeSkyGridScreen extends Screen {
                 boolean hasNonZeroBlock = config.blocks().values().stream().anyMatch(weight -> weight > 0);
                 if (hasNonZeroBlock) {
                     ChunkGenerator chunkGenerator = new SkyGridChunkGenerator(new FixedBiomeSource(biomeEntry), config);
-                    DimensionOptions dimensionOptions;
-                    if (
-                            dimensionOptionsRegistryKey == DimensionOptions.OVERWORLD ||
-                                    dimensionOptionsRegistryKey == DimensionOptions.NETHER ||
-                                    dimensionOptionsRegistryKey == DimensionOptions.END
-                    ) {
-                        dimensionOptions = parent.getWorldCreator().getGeneratorOptionsHolder().selectedDimensions().dimensions().get(dimensionOptionsRegistryKey);
-                    } else {
-                        dimensionOptions = parent.getWorldCreator().getGeneratorOptionsHolder().dimensionOptionsRegistry().get(dimensionOptionsRegistryKey);
-                    }
+                    DimensionOptions dimensionOptions = parent.getWorldCreator().getGeneratorOptionsHolder().selectedDimensions().dimensions().get(dimensionOptionsRegistryKey);
+
                     RegistryEntry<DimensionType> dimensionTypeRegistryEntry = dimensionOptions.dimensionTypeEntry();
                     DimensionOptions newDimensionOptions = new DimensionOptions(dimensionTypeRegistryEntry, chunkGenerator);
                     updatedDimensions.put(dimensionOptionsRegistryKey, newDimensionOptions);
