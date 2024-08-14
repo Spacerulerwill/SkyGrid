@@ -15,10 +15,10 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 
 @Environment(EnvType.CLIENT)
-public class CustomizeMobSpawnerTab extends CustomizeSkyGridTab<CustomizeMobSpawnerTab.EntityListWidget> {
+public class CustomizeSkyGridMobSpawnerTab extends CustomizeSkyGridTab<CustomizeSkyGridMobSpawnerTab.EntityListWidget> {
     private Optional<EntityType<?>> currentEntity;
 
-    public CustomizeMobSpawnerTab(MinecraftClient client, CustomizeSkyGridScreen parent) {
+    public CustomizeSkyGridMobSpawnerTab(MinecraftClient client, CustomizeSkyGridScreen parent) {
         super(client, parent, Text.translatable("createWorld.customize.skygrid.tab.mob_spawner"), EntityListWidget::new);
     }
 
@@ -59,12 +59,12 @@ public class CustomizeMobSpawnerTab extends CustomizeSkyGridTab<CustomizeMobSpaw
             this.clearEntries();
             LinkedHashSet<EntityType<?>> entities = this.parent.getCurrentConfig().spawnerEntities();
             for (EntityType<?> entity: entities) {
-                this.addEntry(new CustomizeMobSpawnerTab.EntityListWidgetEntry(this.parent, entity));
+                this.addEntry(new CustomizeSkyGridMobSpawnerTab.EntityListWidgetEntry(this.parent, entity));
             }
         }
 
         public void addEntity(EntityType<?> entity) {
-            this.addEntry(new CustomizeMobSpawnerTab.EntityListWidgetEntry(this.parent, entity));
+            this.addEntry(new CustomizeSkyGridMobSpawnerTab.EntityListWidgetEntry(this.parent, entity));
         }
 
         public void removeEntity(EntityType<?> entity) {

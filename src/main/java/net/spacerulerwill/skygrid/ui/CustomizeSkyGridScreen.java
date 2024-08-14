@@ -86,7 +86,7 @@ public class CustomizeSkyGridScreen extends Screen {
     protected void init() {
         // Build tab navigation
         CustomizeSkyGridBlockTab blockTab = new CustomizeSkyGridBlockTab(this.client, this);
-        CustomizeMobSpawnerTab mobSpawnerTab = new CustomizeMobSpawnerTab(this.client, this);
+        CustomizeSkyGridMobSpawnerTab mobSpawnerTab = new CustomizeSkyGridMobSpawnerTab(this.client, this);
         this.currentTab = blockTab;
         tabNavigation = TabNavigationWidget.builder(tabManager, width)
                 .tabs(new Tab[]{
@@ -135,6 +135,7 @@ public class CustomizeSkyGridScreen extends Screen {
             close();
         }).width(75).build());
         row3.add(ButtonWidget.builder(Text.translatable("createWorld.customize.skygrid.button.presets"), (button) -> {
+            this.client.setScreen(new CustomizeSkyGridPresetsScreen(this.client, this));
         }).width(75).build());
 
         // Add rows to the main layout
@@ -241,7 +242,6 @@ public class CustomizeSkyGridScreen extends Screen {
             return new DimensionOptionsRegistryHolder(ImmutableMap.copyOf(updatedDimensions));
         };
     }
-
 
     public SkyGridChunkGeneratorConfig getCurrentConfig() {
         return dimensionChunkGeneratorConfigs.get(currentDimension);
