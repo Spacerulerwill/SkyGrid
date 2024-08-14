@@ -7,6 +7,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.world.CustomizeFlatLevelScreen;
 import net.minecraft.client.gui.widget.SliderWidget;
@@ -21,6 +22,7 @@ import net.minecraft.client.world.GeneratorOptionsHolder;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
@@ -29,6 +31,7 @@ import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
 import net.minecraft.world.biome.source.FixedBiomeSource;
@@ -42,6 +45,7 @@ import net.spacerulerwill.skygrid.util.WorldPresetExtension;
 import net.spacerulerwill.skygrid.worldgen.SkyGridChunkGenerator;
 import net.spacerulerwill.skygrid.worldgen.SkyGridChunkGeneratorConfig;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
 import java.util.List;
@@ -58,6 +62,9 @@ public class CustomizeSkyGridScreen extends Screen {
     private BlockTab blockTab;
     private MobSpawnerTab mobSpawnerTab;
     private ButtonWidget deleteButton;
+    private ButtonWidget addButton;
+    private CustomizeSkyGridTextFieldWidget textFieldWidget;
+    private Block currentBlockToAdd;
 
     // Other Stuff
     private final Map<RegistryKey<DimensionOptions>, SkyGridChunkGeneratorConfig> dimensionChunkGeneratorConfigs;
@@ -81,6 +88,7 @@ public class CustomizeSkyGridScreen extends Screen {
             dimensions.add(entry.getKey());
             dimensionChunkGeneratorConfigs.put(entry.getKey(), SkyGridChunkGeneratorConfig.getDefaultConfigForModded());
         });
+        currentBlockToAdd = Blocks.AIR;
     }
 
     protected void init() {
@@ -102,8 +110,13 @@ public class CustomizeSkyGridScreen extends Screen {
         DirectionalLayoutWidget rows = layout.addFooter(DirectionalLayoutWidget.vertical().spacing(4));
 
         DirectionalLayoutWidget row1 = DirectionalLayoutWidget.horizontal().spacing(8);
-        row1.add(new TextFieldWidget(textRenderer, 158, 20, Text.translatable("createWorld.customize.skygrid.enterBlock")));
-        row1.add(ButtonWidget.builder(Text.translatable("createWorld.customize.skygrid.button.add"), (button) -> {
+        textFieldWidget = row1.add(new CustomizeSkyGridTextFieldWidget(textRenderer, 158, 20, Text.translatable("createWorld.customize.skygrid.enterBlock")));
+        addButton = row1.add(ButtonWidget.builder(Text.translatable("createWorld.customize.skygrid.button.add"), (button) -> {
+            getCurrentConfig().blocks().put(currentBlockToAdd, 100);
+            blockTab.addBlock(currentBlockToAdd, 100);
+            textFieldWidget.setText("");
+            updateAddButtonActive();
+            blockTab.widget.setScrollAmount(blockTab.widget.getMaxScroll());
         }).width(75).build());
 
 
@@ -115,9 +128,13 @@ public class CustomizeSkyGridScreen extends Screen {
                     blockTab.widget.setScrollAmount(0.0);
                     blockTab.refreshWidget();
                     updateDeleteButtonActive();
+                    updateAddButtonActive();
                 })));
         deleteButton = row2.add(ButtonWidget.builder(Text.translatable("createWorld.customize.skygrid.button.delete"), (button) -> {
-            blockTab.removeSelectedBlock();
+            Block selectedBlock = blockTab.getSelected();
+            blockTab.removeBlock(selectedBlock);
+            SkyGridChunkGeneratorConfig currentConfig = getCurrentConfig();
+            currentConfig.blocks().remove(selectedBlock);
             updateDeleteButtonActive();
         }).width(75).build());
 
@@ -146,6 +163,7 @@ public class CustomizeSkyGridScreen extends Screen {
         // Initialize tab navigation
         initTabNavigation();
         updateDeleteButtonActive();
+        updateAddButtonActive();
     }
 
     public void initTabNavigation() {
@@ -165,6 +183,17 @@ public class CustomizeSkyGridScreen extends Screen {
 
     private void updateDeleteButtonActive() {
         this.deleteButton.active = this.blockTab.hasSelected();
+    }
+
+    private void updateAddButtonActive() {
+        String text = textFieldWidget.getText();
+        try {
+            currentBlockToAdd = Registries.BLOCK.get(Identifier.of(text));
+        } catch (InvalidIdentifierException e) {
+            this.addButton.active = false;
+            return;
+        }
+        this.addButton.active = !currentBlockToAdd.equals(Blocks.AIR) && !getCurrentConfig().blocks().containsKey(currentBlockToAdd);
     }
 
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
@@ -255,8 +284,12 @@ public class CustomizeSkyGridScreen extends Screen {
             return widget.getSelectedOrNull().block;
         }
 
-        private void removeSelectedBlock() {
-            widget.removeSelectedBlock();
+        private void removeBlock(Block block) {
+            widget.removeBlock(block);
+        }
+
+        private void addBlock(Block block, int initialWeight) {
+            widget.addBlock(block, initialWeight);
         }
 
         private boolean hasSelected() {
@@ -264,6 +297,7 @@ public class CustomizeSkyGridScreen extends Screen {
         }
     }
 
+    @Environment(EnvType.CLIENT)
     public class WeightSliderWidget extends SliderWidget {
         private final int minValue;
         private final int maxValue;
@@ -297,6 +331,35 @@ public class CustomizeSkyGridScreen extends Screen {
     }
 
     @Environment(EnvType.CLIENT)
+    class CustomizeSkyGridTextFieldWidget extends TextFieldWidget {
+        public CustomizeSkyGridTextFieldWidget(TextRenderer textRenderer, int x, int y, Text text) {
+            super(textRenderer, x, y, text);
+        }
+
+
+        @Override
+        public boolean charTyped(char chr, int modifiers) {
+            boolean result = super.charTyped(chr, modifiers);
+            onTextChanged();
+            return result;
+        }
+
+        @Override
+        public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+            // Detect if backspace or delete is pressed
+            boolean result = super.keyPressed(keyCode, scanCode, modifiers);
+            if (result && (keyCode == GLFW.GLFW_KEY_BACKSPACE || keyCode == GLFW.GLFW_KEY_DELETE)) {
+                onTextChanged();
+            }
+            return result;
+        }
+
+        private void onTextChanged() {
+            CustomizeSkyGridScreen.this.updateAddButtonActive();
+        }
+    }
+
+    @Environment(EnvType.CLIENT)
     private class SkyGridWeightListWidget extends AlwaysSelectedEntryListWidget<CustomizeSkyGridScreen.SkyGridWeightListWidget.SkyGridWeightEntry> {
         public SkyGridWeightListWidget() {
             super(CustomizeSkyGridScreen.this.client, CustomizeSkyGridScreen.this.width, CustomizeSkyGridScreen.this.height - 117, 43, 24);
@@ -324,16 +387,18 @@ public class CustomizeSkyGridScreen extends Screen {
             CustomizeSkyGridScreen.this.updateDeleteButtonActive();
         }
 
-        private void removeSelectedBlock() {
+        private void removeBlock(Block block) {
             SkyGridChunkGeneratorConfig currentConfig = CustomizeSkyGridScreen.this.getCurrentConfig();
             List<Block> keys = currentConfig.blocks().keySet().stream().toList();
-            Block currentSelected = getSelectedOrNull().block;
-            currentConfig.blocks().remove(currentSelected);
             for (int i = 0; i < keys.size(); i++) {
-                if (keys.get(i) == currentSelected) {
-                    removeEntry(getEntry(i));
+                if (keys.get(i) == block) {
+                    remove(i);
                 }
             }
+        }
+
+        private void addBlock(Block block, int initialWeight) {
+            addEntry(new SkyGridWeightEntry(block, initialWeight, CustomizeSkyGridScreen.this.currentBlockToAdd.getName()));
         }
 
         @Environment(EnvType.CLIENT)
