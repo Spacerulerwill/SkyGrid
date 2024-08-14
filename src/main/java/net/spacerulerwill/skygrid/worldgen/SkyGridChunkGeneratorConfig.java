@@ -11,7 +11,7 @@ import net.spacerulerwill.skygrid.util.BlockWeight;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public record SkyGridChunkGeneratorConfig(LinkedHashMap<Block, Integer> blocks, List<EntityType<?>> spawnerEntities) {
+public record SkyGridChunkGeneratorConfig(LinkedHashMap<Block, Integer> blocks, LinkedHashSet<EntityType<?>> spawnerEntities) {
     public static final Codec<SkyGridChunkGeneratorConfig> CODEC = RecordCodecBuilder.create(
             instance -> instance.group(
                     // Custom codec for blocks
@@ -31,9 +31,15 @@ public record SkyGridChunkGeneratorConfig(LinkedHashMap<Block, Integer> blocks, 
                             .forGetter(SkyGridChunkGeneratorConfig::blocks),
 
                     // Codec for spawner entities
-                    Registries.ENTITY_TYPE.getCodec().listOf().fieldOf("spawner_entities").forGetter(SkyGridChunkGeneratorConfig::spawnerEntities)
+                    Registries.ENTITY_TYPE.getCodec().listOf().fieldOf("spawner_entities")
+                            .xmap(
+                                    LinkedHashSet::new,  // Convert List to LinkedHashSet
+                                    ArrayList::new  // Convert LinkedHashSet to List for serialization
+                            )
+                            .forGetter(SkyGridChunkGeneratorConfig::spawnerEntities)
             ).apply(instance, SkyGridChunkGeneratorConfig::new)
     );
+
 
     public static SkyGridChunkGeneratorConfig getDefaultOverworldConfig() {
         LinkedHashMap<Block, Integer> blocks = new LinkedHashMap<>();
@@ -78,23 +84,22 @@ public record SkyGridChunkGeneratorConfig(LinkedHashMap<Block, Integer> blocks, 
         blocks.put(Blocks.MELON, 5);
         blocks.put(Blocks.MYCELIUM, 15);
 
-        List<EntityType<?>> entities = Arrays.asList(
-                EntityType.CREEPER,
-                EntityType.SKELETON,
-                EntityType.SPIDER,
-                EntityType.CAVE_SPIDER,
-                EntityType.ZOMBIE,
-                EntityType.SLIME,
-                EntityType.PIG,
-                EntityType.SHEEP,
-                EntityType.COW,
-                EntityType.CHICKEN,
-                EntityType.SQUID,
-                EntityType.WOLF,
-                EntityType.ENDERMAN,
-                EntityType.SILVERFISH,
-                EntityType.VILLAGER
-        );
+        LinkedHashSet<EntityType<?>> entities = new LinkedHashSet<>();
+        entities.add(EntityType.CREEPER);
+        entities.add(EntityType.SKELETON);
+        entities.add(EntityType.SPIDER);
+        entities.add(EntityType.CAVE_SPIDER);
+        entities.add(EntityType.ZOMBIE);
+        entities.add(EntityType.SLIME);
+        entities.add(EntityType.PIG);
+        entities.add(EntityType.SHEEP);
+        entities.add(EntityType.COW);
+        entities.add(EntityType.CHICKEN);
+        entities.add(EntityType.SQUID);
+        entities.add(EntityType.WOLF);
+        entities.add(EntityType.ENDERMAN);
+        entities.add(EntityType.SILVERFISH);
+        entities.add(EntityType.VILLAGER);
 
         return new SkyGridChunkGeneratorConfig(blocks, entities);
     }
@@ -112,11 +117,10 @@ public record SkyGridChunkGeneratorConfig(LinkedHashMap<Block, Integer> blocks, 
         blocks.put(Blocks.NETHER_BRICK_STAIRS, 15);
         blocks.put(Blocks.NETHER_WART, 30);
 
-        List<EntityType<?>> entities = Arrays.asList(
-                EntityType.ZOMBIFIED_PIGLIN,
-                EntityType.BLAZE,
-                EntityType.MAGMA_CUBE
-        );
+        LinkedHashSet<EntityType<?>> entities = new LinkedHashSet<>();
+        entities.add(EntityType.ZOMBIFIED_PIGLIN);
+        entities.add(EntityType.BLAZE);
+        entities.add(EntityType.MAGMA_CUBE);
 
         return new SkyGridChunkGeneratorConfig(blocks, entities);
     }
@@ -127,13 +131,13 @@ public record SkyGridChunkGeneratorConfig(LinkedHashMap<Block, Integer> blocks, 
         LinkedHashMap<Block, Integer> blocks = new LinkedHashMap<>();
         blocks.put(Blocks.END_STONE, 1);
 
-        return new SkyGridChunkGeneratorConfig(blocks, List.of());
+        return new SkyGridChunkGeneratorConfig(blocks, new LinkedHashSet<>());
     }
 
 
     public static SkyGridChunkGeneratorConfig getDefaultConfigForModded() {
         return new SkyGridChunkGeneratorConfig(
-                new LinkedHashMap<>(), List.of()
+                new LinkedHashMap<>(), new LinkedHashSet<>()
         );
     }
 }

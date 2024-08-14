@@ -6,6 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.MobSpawnerBlockEntity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.ChunkRegion;
@@ -37,12 +38,14 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
     private final SkyGridChunkGeneratorConfig config;
     private final Random random;
     private final ProbabilityTable<Block> blockProbabilities;
+    private final List<EntityType<?>> entities;
 
     public SkyGridChunkGenerator(BiomeSource biomeSource, SkyGridChunkGeneratorConfig config) {
         super(biomeSource);
         this.config = config;
         random = Random.create();
         blockProbabilities = createBlockProbabilities(config.blocks());
+        this.entities = config.spawnerEntities().stream().toList();
     }
 
     private ProbabilityTable<Block> createBlockProbabilities(LinkedHashMap<Block, Integer> blockWeights) {
@@ -124,9 +127,9 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
                     BlockPos blockPos = new BlockPos(x, y, z);
                     Block block = blockProbabilities.pickRandom(random);
                     chunk.setBlockState(blockPos, block.getDefaultState(), false);
-                    if (block.equals(Blocks.SPAWNER)) {
+                    if (block.equals(Blocks.SPAWNER) && !this.entities.isEmpty()) {
                         MobSpawnerBlockEntity mobSpawnerBlockEntity = new MobSpawnerBlockEntity(new BlockPos(worldX, y, worldZ), block.getDefaultState());
-                        mobSpawnerBlockEntity.setEntityType(config.spawnerEntities().get(random.nextInt(config.spawnerEntities().size())), Random.create());
+                        mobSpawnerBlockEntity.setEntityType(this.entities.get(random.nextInt(config.spawnerEntities().size())), Random.create());
                         chunk.setBlockEntity(mobSpawnerBlockEntity);
                     }
                 }
