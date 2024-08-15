@@ -52,6 +52,8 @@ public class CustomizeSkyGridScreen extends Screen {
     private ButtonWidget deleteButton;
     private ButtonWidget addButton;
     private CustomizeSkyGridTextFieldWidget textFieldWidget;
+    private CustomizeSkyGridBlockTab blockTab;
+    private CustomizeSkyGridMobSpawnerTab mobSpawnerTab;
     private CustomizeSkyGridTab<?> currentTab;
 
     // Other Stuff
@@ -88,8 +90,8 @@ public class CustomizeSkyGridScreen extends Screen {
 
     protected void init() {
         // Build tab navigation
-        CustomizeSkyGridBlockTab blockTab = new CustomizeSkyGridBlockTab(this.client, this);
-        CustomizeSkyGridMobSpawnerTab mobSpawnerTab = new CustomizeSkyGridMobSpawnerTab(this.client, this);
+        this.blockTab = new CustomizeSkyGridBlockTab(this.client, this);
+        this.mobSpawnerTab = new CustomizeSkyGridMobSpawnerTab(this.client, this);
         this.currentTab = blockTab;
         tabNavigation = TabNavigationWidget.builder(tabManager, width)
                 .tabs(new Tab[]{
@@ -177,8 +179,10 @@ public class CustomizeSkyGridScreen extends Screen {
         this.dimensionChunkGeneratorConfigs.put(DimensionOptions.OVERWORLD, preset.overworldConfig);
         this.dimensionChunkGeneratorConfigs.put(DimensionOptions.NETHER, preset.netherConfig);
         this.dimensionChunkGeneratorConfigs.put(DimensionOptions.END, preset.endConfig);
-        this.currentTab.listWidget.refreshEntries();
-        this.currentTab.listWidget.setScrollAmount(0.0);
+        this.blockTab.listWidget.refreshEntries();
+        this.blockTab.listWidget.setScrollAmount(0.0);
+        this.mobSpawnerTab.listWidget.refreshEntries();
+        this.mobSpawnerTab.listWidget.setScrollAmount(0.0);
     }
 
     public void updateDeleteButtonActive() {

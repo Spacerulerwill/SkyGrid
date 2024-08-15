@@ -12,6 +12,7 @@
   "createWorld.customize.skygrid.presets": "SkyGrid Presets",
   "createWorld.skygrid.customize.presets.select": "Select Preset",
   "createWorld.skygrid.customize.presets.preset.classic": "Classic",
+  "createWorld.skygrid.customize.presets.preset.boom": "Boom!",
   "minecraft.overworld": "Overworld",
   "minecraft.the_nether": "The Nether",
   "minecraft.the_end": "The End"

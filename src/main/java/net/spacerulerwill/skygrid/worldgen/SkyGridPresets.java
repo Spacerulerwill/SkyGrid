@@ -4,7 +4,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -13,7 +12,12 @@ import java.util.function.Supplier;
 
 public class SkyGridPresets {
     public static SkyGridPreset getClassicPreset() {
-        return new SkyGridPreset(Blocks.GRASS_BLOCK, "createWorld.skygrid.customize.presets.preset.classic", createClassicOverworldConfig(), createClassicNetherConfig(), createClassicEndConfig());
+        return new SkyGridPreset(
+                Blocks.GRASS_BLOCK,
+                "createWorld.skygrid.customize.presets.preset.classic",
+                createClassicOverworldConfig(),
+                createClassicNetherConfig(),
+                createClassicEndConfig());
     }
 
     private static SkyGridChunkGeneratorConfig createClassicOverworldConfig() {
@@ -107,9 +111,31 @@ public class SkyGridPresets {
         return new SkyGridChunkGeneratorConfig(blocks, new LinkedHashSet<>());
     }
 
+    public static SkyGridPreset getBoomPreset() {
+        return new SkyGridPreset(
+                Blocks.TNT,
+                "createWorld.skygrid.customize.presets.preset.boom",
+                createBoomOverworldConfig(),
+                createBoomOverworldConfig(),
+                createBoomOverworldConfig()
+        );
+    }
+
+    private static SkyGridChunkGeneratorConfig createBoomOverworldConfig() {
+        LinkedHashMap<Block, Integer> blocks = new LinkedHashMap<>();
+        blocks.put(Blocks.TNT, 100);
+        blocks.put(Blocks.SPAWNER, 1);
+
+        LinkedHashSet<EntityType<?>> entities = new LinkedHashSet<>();
+        entities.add(EntityType.CREEPER);
+
+        return new SkyGridChunkGeneratorConfig(blocks, entities);
+    }
+
     public static List<Supplier<SkyGridPreset>> ALL_PRESETS = new ArrayList<>();
 
     static {
         ALL_PRESETS.add(SkyGridPresets::getClassicPreset);
+        ALL_PRESETS.add(SkyGridPresets::getBoomPreset);
     }
 }
