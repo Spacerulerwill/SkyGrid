@@ -31,6 +31,8 @@ import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.spacerulerwill.skygrid.util.WorldPresetExtension;
 import net.spacerulerwill.skygrid.worldgen.SkyGridChunkGenerator;
 import net.spacerulerwill.skygrid.worldgen.SkyGridChunkGeneratorConfig;
+import net.spacerulerwill.skygrid.worldgen.SkyGridPreset;
+import net.spacerulerwill.skygrid.worldgen.SkyGridPresets;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
@@ -64,9 +66,10 @@ public class CustomizeSkyGridScreen extends Screen {
         this.parent = parent;
         // Add initial dimension configs (default values for vanilla dimensions)
         this.dimensionChunkGeneratorConfigs = new HashMap<>();
-        this.dimensionChunkGeneratorConfigs.put(DimensionOptions.OVERWORLD, SkyGridChunkGeneratorConfig.getDefaultOverworldConfig());
-        this.dimensionChunkGeneratorConfigs.put(DimensionOptions.NETHER, SkyGridChunkGeneratorConfig.getDefaultNetherConfig());
-        this.dimensionChunkGeneratorConfigs. put(DimensionOptions.END, SkyGridChunkGeneratorConfig.getDefaultEndConfig());
+        SkyGridPreset classic = SkyGridPresets.getClassicPreset();
+        this.dimensionChunkGeneratorConfigs.put(DimensionOptions.OVERWORLD, classic.overworldConfig);
+        this.dimensionChunkGeneratorConfigs.put(DimensionOptions.NETHER, classic.netherConfig);
+        this.dimensionChunkGeneratorConfigs. put(DimensionOptions.END, classic.endConfig);
         // Array of dimensions options registry keys
         this.currentDimension = DimensionOptions.OVERWORLD;
         this.dimensions.add(DimensionOptions.OVERWORLD);
@@ -168,6 +171,13 @@ public class CustomizeSkyGridScreen extends Screen {
             layout.setHeaderHeight(i);
             layout.refreshPositions();
         }
+    }
+
+    public void setConfigFromPreset(SkyGridPreset preset) {
+        this.dimensionChunkGeneratorConfigs.put(DimensionOptions.OVERWORLD, preset.overworldConfig);
+        this.dimensionChunkGeneratorConfigs.put(DimensionOptions.NETHER, preset.netherConfig);
+        this.dimensionChunkGeneratorConfigs.put(DimensionOptions.END, preset.endConfig);
+        this.currentTab.listWidget.refreshEntries();
     }
 
     public void updateDeleteButtonActive() {
