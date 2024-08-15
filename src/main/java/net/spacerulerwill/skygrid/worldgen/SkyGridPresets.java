@@ -101,7 +101,6 @@ public class SkyGridPresets {
     }
 
     private static SkyGridChunkGeneratorConfig createClassicEndConfig() {
-        // Create a map to store block weights
         LinkedHashMap<Block, Integer> blocks = new LinkedHashMap<>();
         blocks.put(Blocks.END_STONE, 1);
 
@@ -112,6 +111,5 @@ public class SkyGridPresets {
 
     static {
         ALL_PRESETS.add(SkyGridPresets::getClassicPreset);
-        // Add more presets if needed
     }
 }

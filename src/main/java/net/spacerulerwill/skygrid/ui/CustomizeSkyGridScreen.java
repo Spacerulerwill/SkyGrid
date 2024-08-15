@@ -178,6 +178,7 @@ public class CustomizeSkyGridScreen extends Screen {
         this.dimensionChunkGeneratorConfigs.put(DimensionOptions.NETHER, preset.netherConfig);
         this.dimensionChunkGeneratorConfigs.put(DimensionOptions.END, preset.endConfig);
         this.currentTab.listWidget.refreshEntries();
+        this.currentTab.listWidget.setScrollAmount(0.0);
     }
 
     public void updateDeleteButtonActive() {
