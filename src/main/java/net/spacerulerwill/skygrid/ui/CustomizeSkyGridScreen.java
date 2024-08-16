@@ -123,6 +123,8 @@ public class CustomizeSkyGridScreen extends Screen {
                 .build(0, 0, 158, 20, Text.translatable("createWorld.customize.skygrid.button.dimension"), ((button, value) -> {
                     this.currentDimension = value;
                     this.currentTab.onDimensionChange();
+                    this.blockTab.listWidget.refreshEntries();
+                    this.mobSpawnerTab.listWidget.refreshEntries();
                     this.updateDeleteButtonActive();
                     this.updateAddButtonActive();
                 })));

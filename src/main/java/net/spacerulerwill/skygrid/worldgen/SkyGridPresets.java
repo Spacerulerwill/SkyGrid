@@ -116,8 +116,8 @@ public class SkyGridPresets {
                 Blocks.TNT,
                 "createWorld.skygrid.customize.presets.preset.boom",
                 createBoomOverworldConfig(),
-                createBoomOverworldConfig(),
-                createBoomOverworldConfig()
+                createBoomNetherConfig(),
+                createBoomEndConfig()
         );
     }
 
@@ -128,6 +128,30 @@ public class SkyGridPresets {
 
         LinkedHashSet<EntityType<?>> entities = new LinkedHashSet<>();
         entities.add(EntityType.CREEPER);
+
+        return new SkyGridChunkGeneratorConfig(blocks, entities);
+    }
+
+    private static SkyGridChunkGeneratorConfig createBoomNetherConfig() {
+        LinkedHashMap<Block, Integer> blocks = new LinkedHashMap<>();
+        blocks.put(Blocks.TNT, 100);
+        blocks.put(Blocks.SPAWNER, 1);
+
+        LinkedHashSet<EntityType<?>> entities = new LinkedHashSet<>();
+        entities.add(EntityType.BLAZE);
+        entities.add(EntityType.GHAST);
+
+        return new SkyGridChunkGeneratorConfig(blocks, entities);
+    }
+
+    private static SkyGridChunkGeneratorConfig createBoomEndConfig() {
+        LinkedHashMap<Block, Integer> blocks = new LinkedHashMap<>();
+        blocks.put(Blocks.TNT, 100);
+        blocks.put(Blocks.SPAWNER, 1);
+
+        LinkedHashSet<EntityType<?>> entities = new LinkedHashSet<>();
+        entities.add(EntityType.ENDERMITE);
+        entities.add(EntityType.ENDERMAN);
 
         return new SkyGridChunkGeneratorConfig(blocks, entities);
     }

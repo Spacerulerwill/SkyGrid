@@ -6,10 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.MobSpawnerBlockEntity;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.EntityType;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.ChunkRegion;
@@ -63,10 +60,9 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
         return new ProbabilityTable<>(probabilities);
     }
 
-    private Random getRandomForChunk(int x, int z) {
-        long seed = (1610612741L * (long)x + 805306457L * (long)z + 402653189L) ^ 201326611L;
+    private Random getRandomForChunk(int x, int z, long seed) {
         Random random = Random.createLocal();
-        random.setSeed(seed);
+        random.setSeed((1610612741L * (long)x + 805306457L * (long)z + 402653189L) ^ seed);
         return random;
     }
 
@@ -125,7 +121,7 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
     // Doing it all here is good enough for now
     @Override
     public CompletableFuture<Chunk> populateNoise(Blender blender, NoiseConfig noiseConfig, StructureAccessor structureAccessor, Chunk chunk) {
-        Random random = this.getRandomForChunk(chunk.getPos().x, chunk.getPos().z);
+        Random random = this.getRandomForChunk(chunk.getPos().x, chunk.getPos().z, 0);
         for (int x = 0; x < 16; x += 4) {
             for (int z = 0; z < 16; z += 4) {
                 int worldX = chunk.getPos().x * 16 + x;
@@ -148,7 +144,7 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
     // Get one column of the terrain
     @Override
     public VerticalBlockSample getColumnSample(int x, int z, HeightLimitView world, NoiseConfig noiseConfig) {
-        Random random = this.getRandomForChunk(x >> 4, z >> 4);
+        Random random = this.getRandomForChunk(x >> 4, z >> 4, 0);
         BlockState[] states = new BlockState[getWorldHeight() / 4];
         for (int y = getMinimumY(); y < getMinimumY() + getWorldHeight(); y += 4) {
             states[(y - getMinimumY()) / 4] = blockProbabilities.pickRandom(random).getDefaultState();
