@@ -6,7 +6,10 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.MobSpawnerBlockEntity;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.EntityType;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.ChunkRegion;
@@ -18,10 +21,15 @@ import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.GenerationStep;
 import net.minecraft.world.gen.StructureAccessor;
-import net.minecraft.world.gen.chunk.*;
+import net.minecraft.world.gen.chunk.Blender;
+import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.gen.chunk.VerticalBlockSample;
 import net.minecraft.world.gen.noise.NoiseConfig;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import net.spacerulerwill.skygrid.util.ProbabilityTable;
@@ -36,14 +44,12 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
     );
 
     private final SkyGridChunkGeneratorConfig config;
-    private final Random random;
     private final ProbabilityTable<Block> blockProbabilities;
     private final List<EntityType<?>> entities;
 
     public SkyGridChunkGenerator(BiomeSource biomeSource, SkyGridChunkGeneratorConfig config) {
         super(biomeSource);
         this.config = config;
-        random = Random.create();
         blockProbabilities = createBlockProbabilities(config.blocks());
         this.entities = config.spawnerEntities().stream().toList();
     }
@@ -57,10 +63,11 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
         return new ProbabilityTable<>(probabilities);
     }
 
-
-    // Seed the random number generator with a hash function based on the column x and z
-    private void seedRandomForColumn(int x, int z) {
-        random.setSeed((1610612741L * (long)x + 805306457L * (long)z + 402653189L) ^ 201326611L);
+    private Random getRandomForChunk(int x, int z) {
+        long seed = (1610612741L * (long)x + 805306457L * (long)z + 402653189L) ^ 201326611L;
+        Random random = Random.createLocal();
+        random.setSeed(seed);
+        return random;
     }
 
     @Override
@@ -118,18 +125,18 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
     // Doing it all here is good enough for now
     @Override
     public CompletableFuture<Chunk> populateNoise(Blender blender, NoiseConfig noiseConfig, StructureAccessor structureAccessor, Chunk chunk) {
+        Random random = this.getRandomForChunk(chunk.getPos().x, chunk.getPos().z);
         for (int x = 0; x < 16; x += 4) {
             for (int z = 0; z < 16; z += 4) {
                 int worldX = chunk.getPos().x * 16 + x;
                 int worldZ = chunk.getPos().z * 16 + z;
-                seedRandomForColumn(worldX, worldZ);
                 for (int y = getMinimumY(); y < getMinimumY() + getWorldHeight(); y += 4) {
                     BlockPos blockPos = new BlockPos(x, y, z);
                     Block block = blockProbabilities.pickRandom(random);
                     chunk.setBlockState(blockPos, block.getDefaultState(), false);
                     if (block.equals(Blocks.SPAWNER) && !this.entities.isEmpty()) {
                         MobSpawnerBlockEntity mobSpawnerBlockEntity = new MobSpawnerBlockEntity(new BlockPos(worldX, y, worldZ), block.getDefaultState());
-                        mobSpawnerBlockEntity.setEntityType(this.entities.get(random.nextInt(config.spawnerEntities().size())), Random.create());
+                        mobSpawnerBlockEntity.setEntityType(this.entities.get(random.nextInt(config.spawnerEntities().size())), random);
                         chunk.setBlockEntity(mobSpawnerBlockEntity);
                     }
                 }
@@ -141,9 +148,9 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
     // Get one column of the terrain
     @Override
     public VerticalBlockSample getColumnSample(int x, int z, HeightLimitView world, NoiseConfig noiseConfig) {
-        BlockState[] states = new BlockState[getWorldHeight() / 4 + 1];
-        seedRandomForColumn(x, z);
-        for (int y = getMinimumY(); y <= getMinimumY() + getWorldHeight(); y += 4) {
+        Random random = this.getRandomForChunk(x >> 4, z >> 4);
+        BlockState[] states = new BlockState[getWorldHeight() / 4];
+        for (int y = getMinimumY(); y < getMinimumY() + getWorldHeight(); y += 4) {
             states[(y - getMinimumY()) / 4] = blockProbabilities.pickRandom(random).getDefaultState();
         }
         return new VerticalBlockSample(getMinimumY(), states);
