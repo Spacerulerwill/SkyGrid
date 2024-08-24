@@ -1,7 +1,8 @@
-package net.spacerulerwill.skygrid.ui;
+package net.spacerulerwill.skygrid.ui.widget;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
+import net.spacerulerwill.skygrid.ui.screen.CustomizeSkyGridScreen;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class CustomizeSkyGridListWidget<T extends AlwaysSelectedEntryListWidget.Entry<T>> extends AlwaysSelectedEntryListWidget<T> {

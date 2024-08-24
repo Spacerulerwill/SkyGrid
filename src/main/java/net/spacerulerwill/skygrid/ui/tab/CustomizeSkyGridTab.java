@@ -1,4 +1,4 @@
-package net.spacerulerwill.skygrid.ui;
+package net.spacerulerwill.skygrid.ui.tab;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -7,6 +7,9 @@ import net.minecraft.client.gui.tab.GridScreenTab;
 import net.minecraft.client.gui.widget.GridWidget;
 import net.minecraft.client.gui.widget.Positioner;
 import net.minecraft.text.Text;
+import net.spacerulerwill.skygrid.ui.widget.CustomizeSkyGridListWidget;
+import net.spacerulerwill.skygrid.ui.screen.CustomizeSkyGridScreen;
+import net.spacerulerwill.skygrid.ui.SkyGridListWidgetConstructor;
 
 @Environment(EnvType.CLIENT)
 public abstract class CustomizeSkyGridTab<T extends CustomizeSkyGridListWidget<?>> extends GridScreenTab {
@@ -23,6 +26,15 @@ public abstract class CustomizeSkyGridTab<T extends CustomizeSkyGridListWidget<?
     public void resize() {
         this.listWidget.setWidth(this.parent.width);
         this.listWidget.setHeight(this.parent.height - 117);
+    }
+
+    public void refreshListWidget() {
+        this.listWidget.refreshEntries();
+    }
+
+    public void reset() {
+        this.listWidget.refreshEntries();
+        this.listWidget.setScrollAmount(0.0);
     }
 
     public void onDimensionChange() {

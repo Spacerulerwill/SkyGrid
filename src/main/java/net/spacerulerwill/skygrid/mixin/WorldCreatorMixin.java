@@ -5,7 +5,7 @@ import net.minecraft.client.gui.screen.world.WorldCreator;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.gen.WorldPreset;
-import net.spacerulerwill.skygrid.ui.CustomizeSkyGridScreen;
+import net.spacerulerwill.skygrid.ui.screen.CustomizeSkyGridScreen;
 import net.spacerulerwill.skygrid.SkyGrid;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

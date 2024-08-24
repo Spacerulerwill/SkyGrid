@@ -1,4 +1,4 @@
-package net.spacerulerwill.skygrid.ui;
+package net.spacerulerwill.skygrid.ui.screen;
 
 import com.google.common.collect.ImmutableMap;
 import net.fabricmc.api.EnvType;
@@ -28,6 +28,9 @@ import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.WorldPreset;
 import net.minecraft.world.gen.WorldPresets;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.spacerulerwill.skygrid.ui.tab.CustomizeSkyGridBlockTab;
+import net.spacerulerwill.skygrid.ui.tab.CustomizeSkyGridMobSpawnerTab;
+import net.spacerulerwill.skygrid.ui.tab.CustomizeSkyGridTab;
 import net.spacerulerwill.skygrid.util.WorldPresetExtension;
 import net.spacerulerwill.skygrid.worldgen.SkyGridChunkGenerator;
 import net.spacerulerwill.skygrid.worldgen.SkyGridChunkGeneratorConfig;
@@ -123,8 +126,8 @@ public class CustomizeSkyGridScreen extends Screen {
                 .build(0, 0, 158, 20, Text.translatable("createWorld.customize.skygrid.button.dimension"), ((button, value) -> {
                     this.currentDimension = value;
                     this.currentTab.onDimensionChange();
-                    this.blockTab.listWidget.refreshEntries();
-                    this.mobSpawnerTab.listWidget.refreshEntries();
+                    this.blockTab.refreshListWidget();
+                    this.mobSpawnerTab.refreshListWidget();
                     this.updateDeleteButtonActive();
                     this.updateAddButtonActive();
                 })));
@@ -181,10 +184,8 @@ public class CustomizeSkyGridScreen extends Screen {
         this.dimensionChunkGeneratorConfigs.put(DimensionOptions.OVERWORLD, preset.overworldConfig);
         this.dimensionChunkGeneratorConfigs.put(DimensionOptions.NETHER, preset.netherConfig);
         this.dimensionChunkGeneratorConfigs.put(DimensionOptions.END, preset.endConfig);
-        this.blockTab.listWidget.refreshEntries();
-        this.blockTab.listWidget.setScrollAmount(0.0);
-        this.mobSpawnerTab.listWidget.refreshEntries();
-        this.mobSpawnerTab.listWidget.setScrollAmount(0.0);
+        this.blockTab.reset();
+        this.mobSpawnerTab.reset();
     }
 
     public void updateDeleteButtonActive() {

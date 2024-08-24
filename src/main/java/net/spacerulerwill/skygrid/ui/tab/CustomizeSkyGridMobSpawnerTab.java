@@ -1,4 +1,4 @@
-package net.spacerulerwill.skygrid.ui;
+package net.spacerulerwill.skygrid.ui.tab;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -10,6 +10,8 @@ import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
+import net.spacerulerwill.skygrid.ui.widget.CustomizeSkyGridListWidget;
+import net.spacerulerwill.skygrid.ui.screen.CustomizeSkyGridScreen;
 
 import java.util.LinkedHashSet;
 import java.util.Optional;

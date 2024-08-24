@@ -1,4 +1,4 @@
-package net.spacerulerwill.skygrid.ui;
+package net.spacerulerwill.skygrid.ui.screen;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
