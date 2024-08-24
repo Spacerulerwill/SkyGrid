@@ -164,8 +164,8 @@ public class CustomizeSkyGridScreen extends Screen {
     }
 
     public void initTabNavigation() {
-        this.currentTab.resize();
-
+        this.mobSpawnerTab.resize();
+        this.blockTab.resize();
         if (tabNavigation != null) {
             tabNavigation.setWidth(width);
             tabNavigation.init();

@@ -51,7 +51,7 @@ public class CustomizeSkyGridMobSpawnerTab extends CustomizeSkyGridTab<Customize
     @Environment(EnvType.CLIENT)
     public static class EntityListWidget extends CustomizeSkyGridListWidget<EntityListWidgetEntry> {
         public EntityListWidget(MinecraftClient minecraftClient, CustomizeSkyGridScreen parent) {
-            super(minecraftClient, parent);
+            super(minecraftClient, parent, 15);
         }
 
         @Override

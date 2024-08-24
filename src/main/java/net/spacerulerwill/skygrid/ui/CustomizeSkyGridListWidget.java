@@ -7,8 +7,8 @@ import org.jetbrains.annotations.Nullable;
 public abstract class CustomizeSkyGridListWidget<T extends AlwaysSelectedEntryListWidget.Entry<T>> extends AlwaysSelectedEntryListWidget<T> {
     protected final CustomizeSkyGridScreen parent;
 
-    public CustomizeSkyGridListWidget(MinecraftClient minecraftClient, CustomizeSkyGridScreen parent) {
-        super(minecraftClient, parent.width, parent.height - 117, 43, 24);
+    public CustomizeSkyGridListWidget(MinecraftClient minecraftClient, CustomizeSkyGridScreen parent, int entryHeight) {
+        super(minecraftClient, parent.width, parent.height - 117, 43, entryHeight);
         this.parent = parent;
         this.refreshEntries();
     }

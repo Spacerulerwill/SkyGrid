@@ -61,7 +61,7 @@ public class CustomizeSkyGridBlockTab extends CustomizeSkyGridTab<CustomizeSkyGr
     @Environment(EnvType.CLIENT)
     public static class BlockListWidget extends CustomizeSkyGridListWidget<BlockListWidgetEntry> {
         public BlockListWidget(MinecraftClient minecraftClient, CustomizeSkyGridScreen parent) {
-            super(minecraftClient, parent);
+            super(minecraftClient, parent, 24);
         }
 
         @Override
