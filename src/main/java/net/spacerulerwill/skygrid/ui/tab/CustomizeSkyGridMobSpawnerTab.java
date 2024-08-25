@@ -2,10 +2,12 @@ package net.spacerulerwill.skygrid.ui.tab;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.entity.EntityType;
+import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -13,27 +15,31 @@ import net.minecraft.util.InvalidIdentifierException;
 import net.spacerulerwill.skygrid.ui.widget.CustomizeSkyGridListWidget;
 import net.spacerulerwill.skygrid.ui.screen.CustomizeSkyGridScreen;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Optional;
 
 @Environment(EnvType.CLIENT)
-public class CustomizeSkyGridMobSpawnerTab extends CustomizeSkyGridTab<CustomizeSkyGridMobSpawnerTab.EntityListWidget> {
+public class CustomizeSkyGridMobSpawnerTab extends CustomizeSkyGridTab<CustomizeSkyGridMobSpawnerTab.EntityListWidget, CustomizeSkyGridMobSpawnerTab.EntityAutoCompleteListWidgetEntry> {
     private Optional<EntityType<?>> currentEntity;
+    private MinecraftClient client;
 
     public CustomizeSkyGridMobSpawnerTab(MinecraftClient client, CustomizeSkyGridScreen parent) {
         super(client, parent, Text.translatable("createWorld.customize.skygrid.tab.mob_spawner"), EntityListWidget::new);
+        this.client = client;
     }
 
     @Override
     public boolean shouldAddButtonBeActive() {
-        String text = this.parent.getText();
-        try {
-            this.currentEntity = Registries.ENTITY_TYPE.getOrEmpty(Identifier.of(text));
-        } catch (InvalidIdentifierException e) {
+        EntityAutoCompleteListWidgetEntry entry = (EntityAutoCompleteListWidgetEntry) this.parent.getSelectedEntryOrNull();
+        if (entry == null) {
             this.currentEntity = Optional.empty();
             return false;
+        } else {
+            this.currentEntity = Optional.of(entry.entity);
+            return !this.parent.getCurrentConfig().spawnerEntities().contains(entry.entity);
         }
-        return currentEntity.isPresent() && !this.parent.getCurrentConfig().spawnerEntities().contains(currentEntity.get());
     }
 
     @Override
@@ -41,6 +47,7 @@ public class CustomizeSkyGridMobSpawnerTab extends CustomizeSkyGridTab<Customize
         EntityType<?> entity = this.currentEntity.get();
         this.listWidget.addEntity(entity);
         this.parent.getCurrentConfig().spawnerEntities().add(entity);
+        super.addButtonCallback();
     }
 
     @Override
@@ -50,6 +57,28 @@ public class CustomizeSkyGridMobSpawnerTab extends CustomizeSkyGridTab<Customize
         this.parent.getCurrentConfig().spawnerEntities().remove(entity);
     }
 
+    @Override
+    public CustomizeSkyGridScreen.CustomizeSkyGridTextFieldWidget.AutoCompleteListWidget<EntityAutoCompleteListWidgetEntry> getAutoCompleteListWidget(String text) {
+        List<EntityAutoCompleteListWidgetEntry> results = new ArrayList<>();
+        if (text.isBlank()) {
+            return new CustomizeSkyGridScreen.CustomizeSkyGridTextFieldWidget.AutoCompleteListWidget<EntityAutoCompleteListWidgetEntry>(
+                    this.parent,
+                    this.client,
+                    results
+            );
+        }
+        Registries.ENTITY_TYPE.forEach(entity -> {
+            String blockString = Text.translatable(entity.getTranslationKey()).getString();
+            if (blockString.trim().toLowerCase().startsWith(text)) {
+                results.add(new EntityAutoCompleteListWidgetEntry(entity));
+            }
+        });
+        return new CustomizeSkyGridScreen.CustomizeSkyGridTextFieldWidget.AutoCompleteListWidget<EntityAutoCompleteListWidgetEntry>(
+                this.parent,
+                this.client,
+                results
+        );
+    }
     @Environment(EnvType.CLIENT)
     public static class EntityListWidget extends CustomizeSkyGridListWidget<EntityListWidgetEntry> {
         public EntityListWidget(MinecraftClient minecraftClient, CustomizeSkyGridScreen parent) {
@@ -97,6 +126,25 @@ public class CustomizeSkyGridMobSpawnerTab extends CustomizeSkyGridTab<Customize
         @Override
         public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             context.drawText(this.parent.getTextRenderer(), this.entityType.getName(), x, y, 16777215, false);
+        }
+    }
+
+    @Environment(EnvType.CLIENT)
+    public class EntityAutoCompleteListWidgetEntry extends AlwaysSelectedEntryListWidget.Entry<EntityAutoCompleteListWidgetEntry> {
+        public EntityType<?> entity;
+
+        public EntityAutoCompleteListWidgetEntry(EntityType<?> entity) {
+            this.entity = entity;
+        }
+
+        @Override
+        public Text getNarration() {
+            return Text.of("pain");
+        }
+
+        @Override
+        public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+            context.drawText(CustomizeSkyGridMobSpawnerTab.this.parent.getTextRenderer(), this.entity.getName(), x, y, 16777215, false);
         }
     }
 }

@@ -17,8 +17,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Supplier;
 
 public class CustomizeSkyGridPresetsScreen extends Screen {
-    private CustomizeSkyGridScreen parent;
-    private MinecraftClient client;
+    private final CustomizeSkyGridScreen parent;
+    private final MinecraftClient client;
     private ButtonWidget selectPresetButton;
     private SkyGridPresetListWidget listWidget;
 

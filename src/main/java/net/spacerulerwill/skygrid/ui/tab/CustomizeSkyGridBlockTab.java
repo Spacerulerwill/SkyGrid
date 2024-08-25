@@ -7,6 +7,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.world.CustomizeFlatLevelScreen;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.item.Item;
@@ -21,29 +22,31 @@ import net.spacerulerwill.skygrid.ui.widget.CustomizeSkyGridListWidget;
 import net.spacerulerwill.skygrid.ui.screen.CustomizeSkyGridScreen;
 import net.spacerulerwill.skygrid.worldgen.SkyGridChunkGeneratorConfig;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Environment(EnvType.CLIENT)
-public class CustomizeSkyGridBlockTab extends CustomizeSkyGridTab<CustomizeSkyGridBlockTab.BlockListWidget> {
+public class CustomizeSkyGridBlockTab extends CustomizeSkyGridTab<CustomizeSkyGridBlockTab.BlockListWidget, CustomizeSkyGridBlockTab.BlockAutoCompleteListWidgetEntry> {
     private Optional<Block> currentBlock;
+    private MinecraftClient client;
+    private CustomizeSkyGridScreen parent;
 
     public CustomizeSkyGridBlockTab(MinecraftClient client, CustomizeSkyGridScreen parent) {
         super(client, parent, Text.translatable("createWorld.customize.skygrid.tab.block"), BlockListWidget::new);
+        this.client = client;
+        this.parent = parent;
         this.currentBlock = Optional.empty();
     }
 
     @Override
     public boolean shouldAddButtonBeActive() {
-        String text = this.parent.getText();
-        try {
-            this.currentBlock = Registries.BLOCK.getOrEmpty(Identifier.of(text));
-        } catch (InvalidIdentifierException e) {
+        BlockAutoCompleteListWidgetEntry entry = (BlockAutoCompleteListWidgetEntry) this.parent.getSelectedEntryOrNull();
+        if (entry == null) {
             this.currentBlock = Optional.empty();
             return false;
+        } else {
+            this.currentBlock = Optional.of(entry.block);
+            return !this.parent.getCurrentConfig().blocks().containsKey(entry.block);
         }
-        return currentBlock.isPresent() && !this.parent.getCurrentConfig().blocks().containsKey(currentBlock.get());
     }
 
     @Override
@@ -51,6 +54,7 @@ public class CustomizeSkyGridBlockTab extends CustomizeSkyGridTab<CustomizeSkyGr
         Block block = currentBlock.get();
         this.listWidget.addBlock(block);
         this.parent.getCurrentConfig().blocks().put(block, CustomizeSkyGridScreen.DEFAULT_BLOCK_WEIGHT);
+        super.addButtonCallback();
     }
 
     @Override
@@ -58,6 +62,31 @@ public class CustomizeSkyGridBlockTab extends CustomizeSkyGridTab<CustomizeSkyGr
         Block block = this.listWidget.getSelectedOrNull().block;
         this.listWidget.removeBlock(block);
         this.parent.getCurrentConfig().blocks().remove(block);
+    }
+
+    @Override
+    public CustomizeSkyGridScreen.CustomizeSkyGridTextFieldWidget.AutoCompleteListWidget<BlockAutoCompleteListWidgetEntry> getAutoCompleteListWidget(String text) {
+        List<BlockAutoCompleteListWidgetEntry> results = new ArrayList<>();
+        if (text.isBlank()) {
+            return new CustomizeSkyGridScreen.CustomizeSkyGridTextFieldWidget.AutoCompleteListWidget<BlockAutoCompleteListWidgetEntry>(
+                    this.parent,
+                    this.client,
+                    results
+            );
+        }
+        Registries.BLOCK.forEach(block -> {
+            if (block.asItem() != Items.AIR) {
+                String blockString = Text.translatable(block.getTranslationKey()).getString();
+                if (blockString.trim().toLowerCase().startsWith(text)) {
+                    results.add(new BlockAutoCompleteListWidgetEntry(block));
+                }
+            }
+        });
+        return new CustomizeSkyGridScreen.CustomizeSkyGridTextFieldWidget.AutoCompleteListWidget<BlockAutoCompleteListWidgetEntry>(
+                this.parent,
+                this.client,
+                results
+        );
     }
 
     @Environment(EnvType.CLIENT)
@@ -197,6 +226,52 @@ public class CustomizeSkyGridBlockTab extends CustomizeSkyGridTab<CustomizeSkyGr
             int weight = (int) (this.value * (this.maxValue - this.minValue) + this.minValue);
             SkyGridChunkGeneratorConfig currentConfig = this.parent.getCurrentConfig();
             currentConfig.blocks().put(block, weight);
+        }
+    }
+
+    @Environment(EnvType.CLIENT)
+    public class BlockAutoCompleteListWidgetEntry extends AlwaysSelectedEntryListWidget.Entry<BlockAutoCompleteListWidgetEntry> {
+        public Block block;
+        private static final Identifier SLOT_TEXTURE = Identifier.ofVanilla("container/slot");
+
+        public BlockAutoCompleteListWidgetEntry(Block block) {
+            this.block = block;
+        }
+
+        @Override
+        public Text getNarration() {
+            return Text.of("pain");
+        }
+
+        @Override
+        public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+            BlockState blockState = block.getDefaultState();
+            ItemStack itemStack = createItemStackFor(blockState);
+            this.renderIcon(context, x, y, itemStack);
+            context.drawText(CustomizeSkyGridBlockTab.this.parent.getTextRenderer(), itemStack.getName(), x + 18 + 5, y + 3, 16777215, false);
+        }
+
+        private ItemStack createItemStackFor(BlockState state) {
+            Item item = state.getBlock().asItem();
+            if (item == Items.AIR) {
+                if (state.isOf(Blocks.WATER)) {
+                    item = Items.WATER_BUCKET;
+                } else if (state.isOf(Blocks.LAVA)) {
+                    item = Items.LAVA_BUCKET;
+                }
+            }
+            return new ItemStack(item);
+        }
+
+        private void renderIcon(DrawContext context, int x, int y, ItemStack iconItem) {
+            this.renderIconBackgroundTexture(context, x + 1, y + 1);
+            if (!iconItem.isEmpty()) {
+                context.drawItemWithoutEntity(iconItem, x + 2, y + 2);
+            }
+        }
+
+        private void renderIconBackgroundTexture(DrawContext context, int x, int y) {
+            context.drawGuiTexture(SLOT_TEXTURE, x, y, 0, 18, 18);
         }
     }
 }

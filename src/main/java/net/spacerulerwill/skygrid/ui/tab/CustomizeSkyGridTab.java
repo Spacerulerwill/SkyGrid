@@ -4,6 +4,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.tab.GridScreenTab;
+import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.GridWidget;
 import net.minecraft.client.gui.widget.Positioner;
 import net.minecraft.text.Text;
@@ -11,8 +12,10 @@ import net.spacerulerwill.skygrid.ui.widget.CustomizeSkyGridListWidget;
 import net.spacerulerwill.skygrid.ui.screen.CustomizeSkyGridScreen;
 import net.spacerulerwill.skygrid.ui.SkyGridListWidgetConstructor;
 
+import java.util.List;
+
 @Environment(EnvType.CLIENT)
-public abstract class CustomizeSkyGridTab<T extends CustomizeSkyGridListWidget<?>> extends GridScreenTab {
+public abstract class CustomizeSkyGridTab<T extends CustomizeSkyGridListWidget<?>, K extends AlwaysSelectedEntryListWidget.Entry<K>> extends GridScreenTab {
     CustomizeSkyGridScreen parent;
     T listWidget;
     public CustomizeSkyGridTab(MinecraftClient client, CustomizeSkyGridScreen parent, Text title, SkyGridListWidgetConstructor<T> constructor) {
@@ -47,6 +50,7 @@ public abstract class CustomizeSkyGridTab<T extends CustomizeSkyGridListWidget<?
 
     public abstract boolean shouldAddButtonBeActive();
     public abstract void deleteButtonCallback();
+    public abstract CustomizeSkyGridScreen.CustomizeSkyGridTextFieldWidget.AutoCompleteListWidget<K> getAutoCompleteListWidget(String text);
     public void addButtonCallback() {
         this.listWidget.setScrollAmount(this.listWidget.getMaxScroll());
     }
