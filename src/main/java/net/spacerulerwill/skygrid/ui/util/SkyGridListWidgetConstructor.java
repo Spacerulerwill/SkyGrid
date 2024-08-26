@@ -1,4 +1,4 @@
-package net.spacerulerwill.skygrid.ui;
+package net.spacerulerwill.skygrid.ui.util;
 
 import net.minecraft.client.MinecraftClient;
 import net.spacerulerwill.skygrid.ui.screen.CustomizeSkyGridScreen;

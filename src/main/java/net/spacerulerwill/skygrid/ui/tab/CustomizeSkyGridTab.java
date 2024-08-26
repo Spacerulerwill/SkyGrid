@@ -10,9 +10,7 @@ import net.minecraft.client.gui.widget.Positioner;
 import net.minecraft.text.Text;
 import net.spacerulerwill.skygrid.ui.widget.CustomizeSkyGridListWidget;
 import net.spacerulerwill.skygrid.ui.screen.CustomizeSkyGridScreen;
-import net.spacerulerwill.skygrid.ui.SkyGridListWidgetConstructor;
-
-import java.util.List;
+import net.spacerulerwill.skygrid.ui.util.SkyGridListWidgetConstructor;
 
 @Environment(EnvType.CLIENT)
 public abstract class CustomizeSkyGridTab<T extends CustomizeSkyGridListWidget<?>, K extends AlwaysSelectedEntryListWidget.Entry<K>> extends GridScreenTab {

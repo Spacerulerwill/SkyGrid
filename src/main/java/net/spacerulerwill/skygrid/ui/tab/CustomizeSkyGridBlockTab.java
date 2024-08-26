@@ -18,6 +18,7 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
+import net.spacerulerwill.skygrid.ui.util.RenderUtils;
 import net.spacerulerwill.skygrid.ui.widget.CustomizeSkyGridListWidget;
 import net.spacerulerwill.skygrid.ui.screen.CustomizeSkyGridScreen;
 import net.spacerulerwill.skygrid.worldgen.SkyGridChunkGeneratorConfig;
@@ -122,7 +123,6 @@ public class CustomizeSkyGridBlockTab extends CustomizeSkyGridTab<CustomizeSkyGr
 
     @Environment(EnvType.CLIENT)
     public static class BlockListWidgetEntry extends AlwaysSelectedEntryListWidget.Entry<BlockListWidgetEntry> {
-        private static final Identifier SLOT_TEXTURE = Identifier.ofVanilla("container/slot");
         private final BlockWeightSliderWidget weightSliderWidget;
         private final Block block;
 
@@ -138,36 +138,10 @@ public class CustomizeSkyGridBlockTab extends CustomizeSkyGridTab<CustomizeSkyGr
 
         @Override
         public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            BlockState blockState = block.getDefaultState();
-            ItemStack itemStack = createItemStackFor(blockState);
-            this.renderIcon(context, x, y, itemStack);
-
+            RenderUtils.renderBlockIcon(block, context, x, y);
             this.weightSliderWidget.setX(x + 22); // Adjust as needed
             this.weightSliderWidget.setY(y); // Adjust as needed
             this.weightSliderWidget.render(context, mouseX, mouseY, tickDelta);
-        }
-
-        private ItemStack createItemStackFor(BlockState state) {
-            Item item = state.getBlock().asItem();
-            if (item == Items.AIR) {
-                if (state.isOf(Blocks.WATER)) {
-                    item = Items.WATER_BUCKET;
-                } else if (state.isOf(Blocks.LAVA)) {
-                    item = Items.LAVA_BUCKET;
-                }
-            }
-            return new ItemStack(item);
-        }
-
-        private void renderIcon(DrawContext context, int x, int y, ItemStack iconItem) {
-            this.renderIconBackgroundTexture(context, x + 1, y + 1);
-            if (!iconItem.isEmpty()) {
-                context.drawItemWithoutEntity(iconItem, x + 2, y + 2);
-            }
-        }
-
-        private void renderIconBackgroundTexture(DrawContext context, int x, int y) {
-            context.drawGuiTexture(SLOT_TEXTURE, x, y, 0, 18, 18);
         }
 
         // Allowing slider to be draggable
@@ -232,7 +206,6 @@ public class CustomizeSkyGridBlockTab extends CustomizeSkyGridTab<CustomizeSkyGr
     @Environment(EnvType.CLIENT)
     public class BlockAutoCompleteListWidgetEntry extends AlwaysSelectedEntryListWidget.Entry<BlockAutoCompleteListWidgetEntry> {
         public Block block;
-        private static final Identifier SLOT_TEXTURE = Identifier.ofVanilla("container/slot");
 
         public BlockAutoCompleteListWidgetEntry(Block block) {
             this.block = block;
@@ -245,33 +218,8 @@ public class CustomizeSkyGridBlockTab extends CustomizeSkyGridTab<CustomizeSkyGr
 
         @Override
         public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            BlockState blockState = block.getDefaultState();
-            ItemStack itemStack = createItemStackFor(blockState);
-            this.renderIcon(context, x, y, itemStack);
-            context.drawText(CustomizeSkyGridBlockTab.this.parent.getTextRenderer(), itemStack.getName(), x + 18 + 5, y + 3, 16777215, false);
-        }
-
-        private ItemStack createItemStackFor(BlockState state) {
-            Item item = state.getBlock().asItem();
-            if (item == Items.AIR) {
-                if (state.isOf(Blocks.WATER)) {
-                    item = Items.WATER_BUCKET;
-                } else if (state.isOf(Blocks.LAVA)) {
-                    item = Items.LAVA_BUCKET;
-                }
-            }
-            return new ItemStack(item);
-        }
-
-        private void renderIcon(DrawContext context, int x, int y, ItemStack iconItem) {
-            this.renderIconBackgroundTexture(context, x + 1, y + 1);
-            if (!iconItem.isEmpty()) {
-                context.drawItemWithoutEntity(iconItem, x + 2, y + 2);
-            }
-        }
-
-        private void renderIconBackgroundTexture(DrawContext context, int x, int y) {
-            context.drawGuiTexture(SLOT_TEXTURE, x, y, 0, 18, 18);
+            RenderUtils.renderBlockIcon(block, context, x, y);
+            context.drawText(CustomizeSkyGridBlockTab.this.parent.getTextRenderer(), block.getName(), x + 18 + 5, y + 3, 16777215, false);
         }
     }
 }
