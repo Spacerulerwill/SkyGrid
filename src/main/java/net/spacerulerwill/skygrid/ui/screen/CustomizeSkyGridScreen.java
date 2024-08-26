@@ -171,6 +171,20 @@ public class CustomizeSkyGridScreen extends Screen {
         updateAddButtonActive();
     }
 
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        boolean clickedOnWidget = super.mouseClicked(mouseX, mouseY, button);
+
+        if (!clickedOnWidget && this.textFieldWidget != null && this.textFieldWidget.listWidget != null) {
+            if (!this.textFieldWidget.listWidget.isMouseOver(mouseX, mouseY)) {
+                this.textFieldWidget.removeAutoCompleteListWidget();
+            }
+        }
+
+        return clickedOnWidget;
+    }
+
+
     public void initTabNavigation() {
         this.mobSpawnerTab.resize();
         this.blockTab.resize();
@@ -310,7 +324,6 @@ public class CustomizeSkyGridScreen extends Screen {
             }
         }
 
-
         @Override
         public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
             boolean result = super.keyPressed(keyCode, scanCode, modifiers);
@@ -319,6 +332,15 @@ public class CustomizeSkyGridScreen extends Screen {
             }
             return result;
         }
+
+
+        @Override
+        public void onClick(double mouseX, double mouseY) {
+            if (this.listWidget == null) {
+                updateAutoCompleteListWidgetState();
+            }
+        }
+
 
         private void onTextChanged() {
             updateAutoCompleteListWidgetState();
@@ -334,10 +356,7 @@ public class CustomizeSkyGridScreen extends Screen {
                     this.listWidget = null;
                 }
             } else {
-                if (this.listWidget != null) {
-                    CustomizeSkyGridScreen.this.showButtonsHideAutoComplete();
-                    CustomizeSkyGridScreen.this.remove(this.listWidget);
-                }
+                this.removeAutoCompleteListWidget();
                 CustomizeSkyGridScreen.this.addDrawableChild(newWidget);
                 this.listWidget = newWidget;
                 this.refreshPosition();
@@ -345,9 +364,19 @@ public class CustomizeSkyGridScreen extends Screen {
             }
         }
 
+        public void removeAutoCompleteListWidget() {
+            if (this.listWidget != null) {
+                CustomizeSkyGridScreen.this.showButtonsHideAutoComplete();
+                CustomizeSkyGridScreen.this.remove(this.listWidget);
+                this.listWidget = null;
+                CustomizeSkyGridScreen.this.updateAddButtonActive();
+            }
+        }
+
+
 
         public static class AutoCompleteListWidget<T extends AlwaysSelectedEntryListWidget.Entry<T>> extends AlwaysSelectedEntryListWidget<T> {
-            private CustomizeSkyGridScreen parent;
+            private final CustomizeSkyGridScreen parent;
             public AutoCompleteListWidget(CustomizeSkyGridScreen parent, MinecraftClient minecraftClient, List<T> entries) {
                 super(minecraftClient, 158, 44, 0, 24);
                 entries.forEach(this::addEntry);
