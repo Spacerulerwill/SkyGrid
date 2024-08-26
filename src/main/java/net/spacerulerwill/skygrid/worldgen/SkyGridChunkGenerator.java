@@ -6,7 +6,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.MobSpawnerBlockEntity;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.EntityType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
@@ -31,7 +30,6 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import net.spacerulerwill.skygrid.util.ProbabilityTable;
-import net.spacerulerwill.skygrid.util.ProbabilityTable.Probability;
 
 public class SkyGridChunkGenerator extends ChunkGenerator {
     public static final MapCodec<SkyGridChunkGenerator> MAP_CODEC = RecordCodecBuilder.mapCodec(instance ->
@@ -53,7 +51,7 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
     }
 
     private ProbabilityTable<Block> createBlockProbabilities(LinkedHashMap<Block, Integer> blockWeights) {
-        ArrayList<Probability<Block>> probabilities = new ArrayList<>();
+        ArrayList<ProbabilityTable.Probability<Block>> probabilities = new ArrayList<>();
         probabilities.ensureCapacity(blockWeights.size());
         for (Map.Entry<Block, Integer> entry : blockWeights.entrySet()) {
             probabilities.add(new ProbabilityTable.Probability<>(entry.getKey(), entry.getValue()));
@@ -127,7 +125,7 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
                 int worldZ = chunk.getPos().z * 16 + z;
                 for (int y = getMinimumY(); y < getMinimumY() + getWorldHeight(); y += 4) {
                     BlockPos blockPos = new BlockPos(x, y, z);
-                    Block block = blockProbabilities.pickRandom(random);
+                    Block block = blockProbabilities.sample(random);
                     chunk.setBlockState(blockPos, block.getDefaultState(), false);
                     if (block.equals(Blocks.SPAWNER) && !this.entities.isEmpty()) {
                         MobSpawnerBlockEntity mobSpawnerBlockEntity = new MobSpawnerBlockEntity(new BlockPos(worldX, y, worldZ), block.getDefaultState());
@@ -146,7 +144,7 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
         Random random = this.getRandomForChunk(noiseConfig, x >> 4, z >> 4);
         BlockState[] states = new BlockState[getWorldHeight() / 4];
         for (int y = getMinimumY(); y < getMinimumY() + getWorldHeight(); y += 4) {
-            states[(y - getMinimumY()) / 4] = blockProbabilities.pickRandom(random).getDefaultState();
+            states[(y - getMinimumY()) / 4] = blockProbabilities.sample(random).getDefaultState();
         }
         return new VerticalBlockSample(getMinimumY(), states);
     }
