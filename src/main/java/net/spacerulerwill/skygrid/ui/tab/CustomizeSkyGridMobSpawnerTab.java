@@ -90,12 +90,12 @@ public class CustomizeSkyGridMobSpawnerTab extends CustomizeSkyGridTab<Customize
             this.clearEntries();
             LinkedHashSet<EntityType<?>> entities = this.parent.getCurrentConfig().spawnerEntities();
             for (EntityType<?> entity: entities) {
-                this.addEntry(new CustomizeSkyGridMobSpawnerTab.EntityListWidgetEntry(this.parent, entity));
+                this.addEntry(new EntityListWidgetEntry(this.parent, entity));
             }
         }
 
         public void addEntity(EntityType<?> entity) {
-            this.addEntry(new CustomizeSkyGridMobSpawnerTab.EntityListWidgetEntry(this.parent, entity));
+            this.addEntry(new EntityListWidgetEntry(this.parent, entity));
         }
 
         public void removeEntity(EntityType<?> entity) {

@@ -10,9 +10,11 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.ScreenRect;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.world.CreateWorldScreen;
+import net.minecraft.client.gui.screen.world.CustomizeFlatLevelScreen;
 import net.minecraft.client.gui.tab.Tab;
 import net.minecraft.client.gui.tab.TabManager;
 import net.minecraft.client.gui.widget.*;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.world.GeneratorOptionsHolder;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
@@ -166,7 +168,7 @@ public class CustomizeSkyGridScreen extends Screen {
         });
 
         // Initialize tab navigation
-        initTabNavigation();
+        refreshWidgetPositions();
         updateDeleteButtonActive();
         updateAddButtonActive();
     }
@@ -185,7 +187,7 @@ public class CustomizeSkyGridScreen extends Screen {
     }
 
 
-    public void initTabNavigation() {
+    public void refreshWidgetPositions() {
         this.mobSpawnerTab.resize();
         this.blockTab.resize();
         if (tabNavigation != null) {
@@ -234,7 +236,7 @@ public class CustomizeSkyGridScreen extends Screen {
         super.render(context, mouseX, mouseY, delta);
 
         RenderSystem.enableBlend();
-        context.drawTexture(Screen.FOOTER_SEPARATOR_TEXTURE, 0, height - layout.getFooterHeight() - 2, 0.0F, 0.0F, width, 2, 32, 2);
+        context.drawTexture(RenderLayer::getGuiTextured, Screen.FOOTER_SEPARATOR_TEXTURE, 0, height - layout.getFooterHeight() - 2, 0.0F, 0.0F, width, 2, 32, 2);
         RenderSystem.disableBlend();
     }
 
@@ -260,8 +262,9 @@ public class CustomizeSkyGridScreen extends Screen {
 
     private GeneratorOptionsHolder.RegistryAwareModifier createModifier() {
         return (dynamicRegistryManager, dimensionsRegistryHolder) -> {
-            Registry<Biome> biomeRegistry = dynamicRegistryManager.get(RegistryKeys.BIOME);
-            RegistryEntry<Biome> biomeEntry = biomeRegistry.entryOf(BiomeKeys.THE_VOID);
+            Registry<Biome> biomeRegistry = dynamicRegistryManager.getOrThrow(RegistryKeys.BIOME);
+            Biome biome = biomeRegistry.get(BiomeKeys.THE_VOID);
+            RegistryEntry<Biome> biomeEntry = biomeRegistry.getEntry(biome);
             Map<RegistryKey<DimensionOptions>, DimensionOptions> updatedDimensions = new HashMap<>(dimensionsRegistryHolder.dimensions());
             dimensionChunkGeneratorConfigs.forEach((dimensionOptionsRegistryKey, config) -> {
                 boolean hasNonZeroBlock = config.blocks().values().stream().anyMatch(weight -> weight > 0);
@@ -280,14 +283,14 @@ public class CustomizeSkyGridScreen extends Screen {
                     been overwritten by our world preset json
                      */
                     if (dimensionOptionsRegistryKey == DimensionOptions.OVERWORLD) {
-                        DimensionOptions defaultOverworld = (dynamicRegistryManager.get(RegistryKeys.WORLD_PRESET).entryOf(WorldPresets.DEFAULT).value()).getOverworld().orElseThrow();
+                        DimensionOptions defaultOverworld = (dynamicRegistryManager.getOrThrow(RegistryKeys.WORLD_PRESET).get(WorldPresets.DEFAULT)).getOverworld().orElseThrow();
                         updatedDimensions.put(dimensionOptionsRegistryKey, defaultOverworld);
                     } else if (dimensionOptionsRegistryKey == DimensionOptions.NETHER) {
-                        WorldPreset preset = (dynamicRegistryManager.get(RegistryKeys.WORLD_PRESET).entryOf(WorldPresets.DEFAULT).value());
+                        WorldPreset preset = (dynamicRegistryManager.getOrThrow(RegistryKeys.WORLD_PRESET).get(WorldPresets.DEFAULT));
                         DimensionOptions defaultNether = ((WorldPresetExtension) preset).skygrid$GetNether().orElseThrow();
                         updatedDimensions.put(dimensionOptionsRegistryKey, defaultNether);
                     } else if (dimensionOptionsRegistryKey == DimensionOptions.END) {
-                        WorldPreset preset = (dynamicRegistryManager.get(RegistryKeys.WORLD_PRESET).entryOf(WorldPresets.DEFAULT).value());
+                        WorldPreset preset = (dynamicRegistryManager.getOrThrow(RegistryKeys.WORLD_PRESET).get(WorldPresets.DEFAULT));
                         DimensionOptions defaultEnd = ((WorldPresetExtension) preset).skygrid$GetEnd().orElseThrow();
                         updatedDimensions.put(dimensionOptionsRegistryKey, defaultEnd);
                     }

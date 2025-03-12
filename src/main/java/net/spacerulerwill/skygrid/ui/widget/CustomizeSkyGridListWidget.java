@@ -16,7 +16,7 @@ public abstract class CustomizeSkyGridListWidget<T extends AlwaysSelectedEntryLi
 
     public void onDimensionChange() {
         this.refreshEntries();
-        this.setScrollAmount(0.0);
+        this.setScrollY(0.0);
     }
 
     @Override

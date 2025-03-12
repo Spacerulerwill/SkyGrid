@@ -7,6 +7,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -74,7 +75,7 @@ public class CustomizeSkyGridPresetsScreen extends Screen {
         }
 
         @Environment(EnvType.CLIENT)
-        public class SkyGridPresetEntry extends AlwaysSelectedEntryListWidget.Entry<SkyGridPresetEntry> {
+        public class SkyGridPresetEntry extends Entry<SkyGridPresetEntry> {
             private static final Identifier SLOT_TEXTURE = Identifier.ofVanilla("container/slot");
             private SkyGridPreset preset;
 
@@ -88,7 +89,7 @@ public class CustomizeSkyGridPresetsScreen extends Screen {
 
             @Override
             public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-                context.drawGuiTexture(SLOT_TEXTURE, x + 1, y + 1, 0, 18, 18);
+                context.drawGuiTexture(RenderLayer::getGuiTextured, SLOT_TEXTURE, x + 1, y + 1, 0, 18, 18);
                 context.drawItemWithoutEntity(preset.item.getDefaultStack(), x + 2, y + 2);
                 context.drawText(CustomizeSkyGridPresetsScreen.this.textRenderer, Text.translatable(preset.name), x + 18 + 5, y + 3, 16777215, false);
             }

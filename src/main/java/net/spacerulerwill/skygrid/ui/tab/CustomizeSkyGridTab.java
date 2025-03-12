@@ -35,7 +35,7 @@ public abstract class CustomizeSkyGridTab<T extends CustomizeSkyGridListWidget<?
 
     public void reset() {
         this.listWidget.refreshEntries();
-        this.listWidget.setScrollAmount(0.0);
+        this.listWidget.setScrollY(0.0);
     }
 
     public void onDimensionChange() {
@@ -50,6 +50,6 @@ public abstract class CustomizeSkyGridTab<T extends CustomizeSkyGridListWidget<?
     public abstract void deleteButtonCallback();
     public abstract CustomizeSkyGridScreen.CustomizeSkyGridTextFieldWidget.AutoCompleteListWidget<K> getAutoCompleteListWidget(String text);
     public void addButtonCallback() {
-        this.listWidget.setScrollAmount(this.listWidget.getMaxScroll());
+        this.listWidget.setScrollY(this.listWidget.getMaxScrollY());
     }
 }

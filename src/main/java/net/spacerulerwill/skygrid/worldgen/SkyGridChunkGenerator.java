@@ -66,6 +66,11 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
     @Override
     protected MapCodec<? extends ChunkGenerator> getCodec() { return MAP_CODEC; }
 
+    @Override
+    public void carve(ChunkRegion chunkRegion, long seed, NoiseConfig noiseConfig, BiomeAccess biomeAccess, StructureAccessor structureAccessor, Chunk chunk) {
+
+    }
+
     public SkyGridChunkGeneratorConfig getConfig() {
         return config;
     }
@@ -77,16 +82,13 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
     public void generateFeatures(StructureWorldAccess world, Chunk chunk, StructureAccessor structureAccessor) {}
 
     @Override
-    public void carve(ChunkRegion chunkRegion, long seed, NoiseConfig noiseConfig, BiomeAccess biomeAccess, StructureAccessor structureAccessor, Chunk chunk, GenerationStep.Carver carverStep) {}
-
-    @Override
     public void buildSurface(ChunkRegion region, StructureAccessor structures, NoiseConfig noiseConfig, Chunk chunk) {}
 
     @Override
     public void populateEntities(ChunkRegion region) {}
 
     @Override
-    public void getDebugHudText(List<String> text, NoiseConfig noiseConfig, BlockPos pos) {}
+    public void appendDebugHudText(List<String> text, NoiseConfig noiseConfig, BlockPos pos) {}
 
     /*
     Used for getting the max block height of any given column in the terrain. Used for structure generation.
