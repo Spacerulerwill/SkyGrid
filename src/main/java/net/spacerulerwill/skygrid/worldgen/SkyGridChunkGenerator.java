@@ -16,20 +16,19 @@ import net.minecraft.world.StructureWorldAccess;
 import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.gen.GenerationStep;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.Blender;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.chunk.VerticalBlockSample;
 import net.minecraft.world.gen.noise.NoiseConfig;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import net.spacerulerwill.skygrid.util.ProbabilityTable;
+import net.spacerulerwill.skygrid.util.MinecraftRandomAdapter;
+import org.apache.commons.rng.sampling.DiscreteProbabilityCollectionSampler;
 
 public class SkyGridChunkGenerator extends ChunkGenerator {
     public static final MapCodec<SkyGridChunkGenerator> MAP_CODEC = RecordCodecBuilder.mapCodec(instance ->
@@ -40,7 +39,7 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
     );
 
     private final SkyGridChunkGeneratorConfig config;
-    private final ProbabilityTable<Block> blockProbabilities;
+    private DiscreteProbabilityCollectionSampler<Block> blockProbabilities;
     private final List<EntityType<?>> entities;
 
     public SkyGridChunkGenerator(BiomeSource biomeSource, SkyGridChunkGeneratorConfig config) {
@@ -50,14 +49,26 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
         this.entities = config.spawnerEntities().stream().toList();
     }
 
-    private ProbabilityTable<Block> createBlockProbabilities(LinkedHashMap<Block, Integer> blockWeights) {
-        ArrayList<ProbabilityTable.Probability<Block>> probabilities = new ArrayList<>();
-        probabilities.ensureCapacity(blockWeights.size());
-        for (Map.Entry<Block, Integer> entry : blockWeights.entrySet()) {
-            probabilities.add(new ProbabilityTable.Probability<>(entry.getKey(), entry.getValue()));
+    private DiscreteProbabilityCollectionSampler<Block> createBlockProbabilities(LinkedHashMap<Block, Integer> blockWeights) {
+        // Calculate the total weight
+        int totalWeight = 0;
+        for (Integer value : blockWeights.values()) {
+            totalWeight += value;
         }
-        return new ProbabilityTable<>(probabilities);
+
+        // Normalize each block's weight
+        Map<Block, Double> normalizedWeights = new LinkedHashMap<>();
+        for (Map.Entry<Block, Integer> entry : blockWeights.entrySet()) {
+            Block block = entry.getKey();
+            Integer weight = entry.getValue();
+            Double normalizedWeight = weight.doubleValue() / totalWeight;
+            normalizedWeights.put(block, normalizedWeight);
+        }
+
+        // Return the DiscreteProbabilityCollectionSampler with normalized weights
+        return new DiscreteProbabilityCollectionSampler<Block>(new MinecraftRandomAdapter(), normalizedWeights);
     }
+
 
     private Random getRandomForChunk(NoiseConfig noiseConfig, int x, int z) {
         return noiseConfig.getOreRandomDeriver().split((1610612741L * (long)x + 805306457L * (long)z + 402653189L) ^ 201326611L);
@@ -67,9 +78,7 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
     protected MapCodec<? extends ChunkGenerator> getCodec() { return MAP_CODEC; }
 
     @Override
-    public void carve(ChunkRegion chunkRegion, long seed, NoiseConfig noiseConfig, BiomeAccess biomeAccess, StructureAccessor structureAccessor, Chunk chunk) {
-
-    }
+    public void carve(ChunkRegion chunkRegion, long seed, NoiseConfig noiseConfig, BiomeAccess biomeAccess, StructureAccessor structureAccessor, Chunk chunk) {}
 
     public SkyGridChunkGeneratorConfig getConfig() {
         return config;
@@ -121,13 +130,14 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
     @Override
     public CompletableFuture<Chunk> populateNoise(Blender blender, NoiseConfig noiseConfig, StructureAccessor structureAccessor, Chunk chunk) {
         Random random = this.getRandomForChunk(noiseConfig, chunk.getPos().x, chunk.getPos().z);
+        blockProbabilities = blockProbabilities.withUniformRandomProvider(new MinecraftRandomAdapter(random));
         for (int x = 0; x < 16; x += 4) {
             for (int z = 0; z < 16; z += 4) {
                 int worldX = chunk.getPos().x * 16 + x;
                 int worldZ = chunk.getPos().z * 16 + z;
                 for (int y = getMinimumY(); y < getMinimumY() + getWorldHeight(); y += 4) {
                     BlockPos blockPos = new BlockPos(x, y, z);
-                    Block block = blockProbabilities.sample(random);
+                    Block block = blockProbabilities.sample();
                     chunk.setBlockState(blockPos, block.getDefaultState(), false);
                     if (block.equals(Blocks.SPAWNER) && !this.entities.isEmpty()) {
                         MobSpawnerBlockEntity mobSpawnerBlockEntity = new MobSpawnerBlockEntity(new BlockPos(worldX, y, worldZ), block.getDefaultState());
@@ -144,9 +154,10 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
     @Override
     public VerticalBlockSample getColumnSample(int x, int z, HeightLimitView world, NoiseConfig noiseConfig) {
         Random random = this.getRandomForChunk(noiseConfig, x >> 4, z >> 4);
+        blockProbabilities = blockProbabilities.withUniformRandomProvider(new MinecraftRandomAdapter(random));
         BlockState[] states = new BlockState[getWorldHeight() / 4];
         for (int y = getMinimumY(); y < getMinimumY() + getWorldHeight(); y += 4) {
-            states[(y - getMinimumY()) / 4] = blockProbabilities.sample(random).getDefaultState();
+            states[(y - getMinimumY()) / 4] = blockProbabilities.sample().getDefaultState();
         }
         return new VerticalBlockSample(getMinimumY(), states);
     }
