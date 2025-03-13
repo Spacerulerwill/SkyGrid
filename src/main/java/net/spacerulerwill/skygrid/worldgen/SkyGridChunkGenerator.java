@@ -5,8 +5,10 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.block.entity.MobSpawnerBlockEntity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.ChunkRegion;
@@ -138,11 +140,16 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
                 for (int y = getMinimumY(); y < getMinimumY() + getWorldHeight(); y += 4) {
                     BlockPos blockPos = new BlockPos(x, y, z);
                     Block block = blockProbabilities.sample();
-                    chunk.setBlockState(blockPos, block.getDefaultState(), false);
+                    BlockState state = block.getDefaultState().withIfExists(Properties.PERSISTENT, true);
+                    chunk.setBlockState(blockPos, state, false);
                     if (block.equals(Blocks.SPAWNER) && !this.entities.isEmpty()) {
                         MobSpawnerBlockEntity mobSpawnerBlockEntity = new MobSpawnerBlockEntity(new BlockPos(worldX, y, worldZ), block.getDefaultState());
                         mobSpawnerBlockEntity.setEntityType(this.entities.get(random.nextInt(config.spawnerEntities().size())), random);
                         chunk.setBlockEntity(mobSpawnerBlockEntity);
+                    }
+                    else if (block.equals(Blocks.CHEST)) {
+                        ChestBlockEntity chestBlockEntity = new ChestBlockEntity(new BlockPos(worldX, y, worldZ), block.getDefaultState());
+                        chunk.setBlockEntity(chestBlockEntity);
                     }
                 }
             }
