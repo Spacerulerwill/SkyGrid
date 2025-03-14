@@ -2,16 +2,12 @@ package net.spacerulerwill.skygrid.ui.tab;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.entity.EntityType;
-import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.InvalidIdentifierException;
 import net.spacerulerwill.skygrid.ui.widget.CustomizeSkyGridListWidget;
 import net.spacerulerwill.skygrid.ui.screen.CustomizeSkyGridScreen;
 
@@ -21,11 +17,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Environment(EnvType.CLIENT)
-public class CustomizeSkyGridMobSpawnerTab extends CustomizeSkyGridTab<CustomizeSkyGridMobSpawnerTab.EntityListWidget, CustomizeSkyGridMobSpawnerTab.EntityAutoCompleteListWidgetEntry> {
+public class SpawnerEntityTab extends CustomizeSkyGridTab<SpawnerEntityTab.EntityListWidget, SpawnerEntityTab.EntityAutoCompleteListWidgetEntry> {
     private Optional<EntityType<?>> currentEntity;
     private MinecraftClient client;
 
-    public CustomizeSkyGridMobSpawnerTab(MinecraftClient client, CustomizeSkyGridScreen parent) {
+    public SpawnerEntityTab(MinecraftClient client, CustomizeSkyGridScreen parent) {
         super(client, parent, Text.translatable("createWorld.customize.skygrid.tab.mob_spawner"), EntityListWidget::new);
         this.client = client;
     }
@@ -144,7 +140,7 @@ public class CustomizeSkyGridMobSpawnerTab extends CustomizeSkyGridTab<Customize
 
         @Override
         public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            context.drawText(CustomizeSkyGridMobSpawnerTab.this.parent.getTextRenderer(), this.entity.getName(), x, y, 16777215, false);
+            context.drawText(SpawnerEntityTab.this.parent.getTextRenderer(), this.entity.getName(), x, y, 16777215, false);
         }
     }
 }

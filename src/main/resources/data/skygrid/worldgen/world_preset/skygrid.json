@@ -67,7 +67,8 @@
                         "minecraft:enderman",
                         "minecraft:silverfish",
                         "minecraft:villager"
-                    ]
+                    ],
+                    "chest_items": {}
                 }
             }
         },
@@ -83,7 +84,8 @@
                     "blocks": {
                         "minecraft:end_stone": 1.0
                     },
-                    "spawner_entities": []
+                    "spawner_entities": [],
+                    "chest_items": {}
                 }
             }
         },
@@ -112,7 +114,8 @@
                         "minecraft:zombified_piglin",
                         "minecraft:blaze",
                         "minecraft:magma_cube"
-                    ]
+                    ],
+                    "chest_items": {}
                 }
             }
         }

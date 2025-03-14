@@ -9,8 +9,6 @@ import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.block.entity.MobSpawnerBlockEntity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
@@ -31,6 +29,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 import net.spacerulerwill.skygrid.util.MinecraftRandomAdapter;
+import org.apache.commons.rng.UniformRandomProvider;
 import org.apache.commons.rng.sampling.DiscreteProbabilityCollectionSampler;
 
 public class SkyGridChunkGenerator extends ChunkGenerator {
@@ -41,18 +40,26 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
             ).apply(instance, SkyGridChunkGenerator::new)
     );
 
+
     private final SkyGridChunkGeneratorConfig config;
     private DiscreteProbabilityCollectionSampler<Block> blockProbabilities;
+    private DiscreteProbabilityCollectionSampler<Item> chestItemProbabilities;
     private final List<EntityType<?>> entities;
+
 
     public SkyGridChunkGenerator(BiomeSource biomeSource, SkyGridChunkGeneratorConfig config) {
         super(biomeSource);
         this.config = config;
-        blockProbabilities = createBlockProbabilities(config.blocks());
+        this.blockProbabilities = createWeightedProbabilityTable(config.blocks());
+        if (config.chestItems().isEmpty()) {
+            this.chestItemProbabilities = null;
+        } else {
+            this.chestItemProbabilities = createWeightedProbabilityTable(config.chestItems());
+        }
         this.entities = config.spawnerEntities().stream().toList();
     }
 
-    private DiscreteProbabilityCollectionSampler<Block> createBlockProbabilities(Map<Block, Integer> blockWeights) {
+    private <T> DiscreteProbabilityCollectionSampler<T> createWeightedProbabilityTable(Map<T, Integer> blockWeights) {
         // Calculate the total weight
         int totalWeight = 0;
         for (Integer value : blockWeights.values()) {
@@ -60,18 +67,17 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
         }
 
         // Normalize each block's weight
-        Map<Block, Double> normalizedWeights = new LinkedHashMap<>();
-        for (Map.Entry<Block, Integer> entry : blockWeights.entrySet()) {
-            Block block = entry.getKey();
+        Map<T, Double> normalizedWeights = new LinkedHashMap<>();
+        for (Map.Entry<T, Integer> entry : blockWeights.entrySet()) {
+            T t = entry.getKey();
             Integer weight = entry.getValue();
             Double normalizedWeight = weight.doubleValue() / totalWeight;
-            normalizedWeights.put(block, normalizedWeight);
+            normalizedWeights.put(t, normalizedWeight);
         }
 
         // Return the DiscreteProbabilityCollectionSampler with normalized weights
-        return new DiscreteProbabilityCollectionSampler<Block>(new MinecraftRandomAdapter(), normalizedWeights);
+        return new DiscreteProbabilityCollectionSampler<T>(new MinecraftRandomAdapter(), normalizedWeights);
     }
-
 
     private Random getRandomForChunk(NoiseConfig noiseConfig, int x, int z) {
         return noiseConfig.getOreRandomDeriver().split((1610612741L * (long)x + 805306457L * (long)z + 402653189L) ^ 201326611L);
@@ -133,7 +139,11 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
     @Override
     public CompletableFuture<Chunk> populateNoise(Blender blender, NoiseConfig noiseConfig, StructureAccessor structureAccessor, Chunk chunk) {
         Random random = this.getRandomForChunk(noiseConfig, chunk.getPos().x, chunk.getPos().z);
-        blockProbabilities = blockProbabilities.withUniformRandomProvider(new MinecraftRandomAdapter(random));
+        UniformRandomProvider uniformRandomProvider = new MinecraftRandomAdapter(random);
+        this.blockProbabilities = this.blockProbabilities.withUniformRandomProvider(uniformRandomProvider);
+        if (this.chestItemProbabilities != null) {
+            this.chestItemProbabilities = this.chestItemProbabilities.withUniformRandomProvider(uniformRandomProvider);
+        }
         for (int x = 0; x < 16; x += 4) {
             for (int z = 0; z < 16; z += 4) {
                 int worldX = chunk.getPos().x * 16 + x;
@@ -151,6 +161,25 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
                     else if (block.equals(Blocks.CHEST)) {
                         ChestBlockEntity chestBlockEntity = new ChestBlockEntity(new BlockPos(worldX, y, worldZ), block.getDefaultState());
                         chunk.setBlockEntity(chestBlockEntity);
+
+                        if (this.chestItemProbabilities != null) {
+                            // How many items for chest
+                            int numItems = random.nextBetween(0, 5);
+                            // Generate 26 numbers and shuffle them
+                            ArrayList<Integer> slots = new ArrayList<>();
+                            for (int i = 0; i <= 26; i++) {
+                                slots.add(i);
+                            }
+                            Collections.shuffle(slots);
+                            // Add the items
+                            int nextSlotIdx = 0;
+                            for (int i = 0; i < numItems; i++) {
+                                Item item = this.chestItemProbabilities.sample();
+                                int slotIdx = slots.get(nextSlotIdx);
+                                nextSlotIdx += 1;
+                                chestBlockEntity.setStack(slotIdx, item.getDefaultStack());
+                            }
+                        }
                     }
                 }
             }

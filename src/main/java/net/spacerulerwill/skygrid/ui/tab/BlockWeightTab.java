@@ -3,21 +3,14 @@ package net.spacerulerwill.skygrid.ui.tab;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.world.CustomizeFlatLevelScreen;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.SliderWidget;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.InvalidIdentifierException;
 import net.spacerulerwill.skygrid.ui.util.RenderUtils;
 import net.spacerulerwill.skygrid.ui.widget.CustomizeSkyGridListWidget;
 import net.spacerulerwill.skygrid.ui.screen.CustomizeSkyGridScreen;
@@ -26,12 +19,12 @@ import net.spacerulerwill.skygrid.worldgen.SkyGridChunkGeneratorConfig;
 import java.util.*;
 
 @Environment(EnvType.CLIENT)
-public class CustomizeSkyGridBlockTab extends CustomizeSkyGridTab<CustomizeSkyGridBlockTab.BlockListWidget, CustomizeSkyGridBlockTab.BlockAutoCompleteListWidgetEntry> {
+public class BlockWeightTab extends CustomizeSkyGridTab<BlockWeightTab.BlockListWidget, BlockWeightTab.BlockAutoCompleteListWidgetEntry> {
     private Optional<Block> currentBlock;
     private MinecraftClient client;
     private CustomizeSkyGridScreen parent;
 
-    public CustomizeSkyGridBlockTab(MinecraftClient client, CustomizeSkyGridScreen parent) {
+    public BlockWeightTab(MinecraftClient client, CustomizeSkyGridScreen parent) {
         super(client, parent, Text.translatable("createWorld.customize.skygrid.tab.block"), BlockListWidget::new);
         this.client = client;
         this.parent = parent;
@@ -219,7 +212,7 @@ public class CustomizeSkyGridBlockTab extends CustomizeSkyGridTab<CustomizeSkyGr
         @Override
         public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             RenderUtils.renderBlockIcon(block, context, x, y);
-            context.drawText(CustomizeSkyGridBlockTab.this.parent.getTextRenderer(), block.getName(), x + 18 + 5, y + 3, 16777215, false);
+            context.drawText(BlockWeightTab.this.parent.getTextRenderer(), block.getName(), x + 18 + 5, y + 3, 16777215, false);
         }
     }
 }

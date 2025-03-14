@@ -15,13 +15,13 @@ import net.spacerulerwill.skygrid.SkyGrid;
 import net.spacerulerwill.skygrid.worldgen.SkyGridPreset;
 import org.jetbrains.annotations.Nullable;
 
-public class CustomizeSkyGridPresetsScreen extends Screen {
+public class SkyGridPresetsScreen extends Screen {
     private final CustomizeSkyGridScreen parent;
     private final MinecraftClient client;
     private ButtonWidget selectPresetButton;
     private SkyGridPresetListWidget listWidget;
 
-    protected CustomizeSkyGridPresetsScreen(MinecraftClient client, CustomizeSkyGridScreen parent) {
+    protected SkyGridPresetsScreen(MinecraftClient client, CustomizeSkyGridScreen parent) {
         super(Text.translatable("createWorld.customize.skygrid.presets"));
         this.client = client;
         this.parent = parent;
@@ -58,7 +58,7 @@ public class CustomizeSkyGridPresetsScreen extends Screen {
     @Environment(EnvType.CLIENT)
     private class SkyGridPresetListWidget extends AlwaysSelectedEntryListWidget<SkyGridPresetListWidget.SkyGridPresetEntry> {
         public SkyGridPresetListWidget() {
-            super(CustomizeSkyGridPresetsScreen.this.client, CustomizeSkyGridPresetsScreen.this.width, CustomizeSkyGridPresetsScreen.this.height - 77, 33, 24);
+            super(SkyGridPresetsScreen.this.client, SkyGridPresetsScreen.this.width, SkyGridPresetsScreen.this.height - 77, 33, 24);
 
             for (SkyGridPreset preset : SkyGrid.presets) {
                 this.addEntry(new SkyGridPresetEntry(preset));
@@ -66,9 +66,9 @@ public class CustomizeSkyGridPresetsScreen extends Screen {
         }
 
         @Override
-        public void setSelected(@Nullable CustomizeSkyGridPresetsScreen.SkyGridPresetListWidget.SkyGridPresetEntry entry) {
+        public void setSelected(@Nullable SkyGridPresetsScreen.SkyGridPresetListWidget.SkyGridPresetEntry entry) {
             super.setSelected(entry);
-            CustomizeSkyGridPresetsScreen.this.updateSelectPresetButtonActive();
+            SkyGridPresetsScreen.this.updateSelectPresetButtonActive();
         }
 
         @Environment(EnvType.CLIENT)
@@ -88,7 +88,7 @@ public class CustomizeSkyGridPresetsScreen extends Screen {
             public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
                 context.drawGuiTexture(RenderLayer::getGuiTextured, SLOT_TEXTURE, x + 1, y + 1, 0, 18, 18);
                 context.drawItemWithoutEntity(preset.item().getDefaultStack(), x + 2, y + 2);
-                context.drawText(CustomizeSkyGridPresetsScreen.this.textRenderer, Text.translatable(preset.name()), x + 18 + 5, y + 3, 16777215, false);
+                context.drawText(SkyGridPresetsScreen.this.textRenderer, Text.translatable(preset.name()), x + 18 + 5, y + 3, 16777215, false);
             }
         }
     }

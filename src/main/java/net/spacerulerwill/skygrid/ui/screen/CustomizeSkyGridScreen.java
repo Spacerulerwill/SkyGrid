@@ -31,8 +31,8 @@ import net.minecraft.world.gen.WorldPreset;
 import net.minecraft.world.gen.WorldPresets;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.spacerulerwill.skygrid.SkyGrid;
-import net.spacerulerwill.skygrid.ui.tab.CustomizeSkyGridBlockTab;
-import net.spacerulerwill.skygrid.ui.tab.CustomizeSkyGridMobSpawnerTab;
+import net.spacerulerwill.skygrid.ui.tab.BlockWeightTab;
+import net.spacerulerwill.skygrid.ui.tab.SpawnerEntityTab;
 import net.spacerulerwill.skygrid.ui.tab.CustomizeSkyGridTab;
 import net.spacerulerwill.skygrid.util.WorldPresetExtension;
 import net.spacerulerwill.skygrid.worldgen.SkyGridChunkGenerator;
@@ -60,8 +60,8 @@ public class CustomizeSkyGridScreen extends Screen {
     private ButtonWidget doneButton;
     private ButtonWidget cancelButton;
     private CustomizeSkyGridTextFieldWidget textFieldWidget;
-    private CustomizeSkyGridBlockTab blockTab;
-    private CustomizeSkyGridMobSpawnerTab mobSpawnerTab;
+    private BlockWeightTab blockTab;
+    private SpawnerEntityTab mobSpawnerTab;
     private CustomizeSkyGridTab<?, ?> currentTab;
 
     // Other Stuff
@@ -100,8 +100,8 @@ public class CustomizeSkyGridScreen extends Screen {
 
     protected void init() {
         // Build tab navigation
-        this.blockTab = new CustomizeSkyGridBlockTab(this.client, this);
-        this.mobSpawnerTab = new CustomizeSkyGridMobSpawnerTab(this.client, this);
+        this.blockTab = new BlockWeightTab(this.client, this);
+        this.mobSpawnerTab = new SpawnerEntityTab(this.client, this);
         this.currentTab = blockTab;
         tabNavigation = TabNavigationWidget.builder(tabManager, width)
                 .tabs(new Tab[]{
@@ -151,7 +151,7 @@ public class CustomizeSkyGridScreen extends Screen {
             close();
         }).width(75).build());
         row3.add(ButtonWidget.builder(Text.translatable("createWorld.customize.skygrid.button.presets"), (button) -> {
-            this.client.setScreen(new CustomizeSkyGridPresetsScreen(this.client, this));
+            this.client.setScreen(new SkyGridPresetsScreen(this.client, this));
         }).width(75).build());
 
         // Add rows to the main layout
