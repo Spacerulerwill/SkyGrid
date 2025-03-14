@@ -5,12 +5,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityType;
 import net.minecraft.registry.Registries;
-import net.minecraft.text.Style;
 import net.minecraft.util.dynamic.Codecs;
-import net.spacerulerwill.skygrid.util.BlockWeight;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public record SkyGridChunkGeneratorConfig(Map<Block, Integer> blocks, LinkedHashSet<EntityType<?>> spawnerEntities) {
 

@@ -5,12 +5,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.dynamic.Codecs;
-import net.spacerulerwill.skygrid.util.BlockWeight;
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.stream.Collectors;
 
 public record SkyGridPreset(Item item, String name, SkyGridChunkGeneratorConfig overworldConfig, SkyGridChunkGeneratorConfig netherConfig, SkyGridChunkGeneratorConfig endConfig) {
     public static final Codec<SkyGridPreset> CODEC = RecordCodecBuilder.create(
