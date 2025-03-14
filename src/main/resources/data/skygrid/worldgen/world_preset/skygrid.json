@@ -1,277 +1,120 @@
 {
-  "dimensions": {
-    "minecraft:overworld": {
-      "type": "minecraft:overworld",
-      "generator": {
-        "type": "skygrid:skygrid",
-        "biome_source": {
-          "type": "minecraft:fixed",
-          "biome": "minecraft:the_void"
-        },
-        "settings": {
-          "blocks": [
-            {
-              "block": "minecraft:stone",
-              "weight": 120.0
-            },
-            {
-              "block": "minecraft:grass_block",
-              "weight": 80.0
-            },
-            {
-              "block": "minecraft:dirt",
-              "weight": 20.0
-            },
-            {
-              "block": "minecraft:water",
-              "weight": 10.0
-            },
-            {
-              "block": "minecraft:lava",
-              "weight": 5.0
-            },
-            {
-              "block": "minecraft:sand",
-              "weight": 20.0
-            },
-            {
-              "block": "minecraft:gravel",
-              "weight": 10.0
-            },
-            {
-              "block": "minecraft:coal_ore",
-              "weight": 40.0
-            },
-            {
-              "block": "minecraft:lapis_ore",
-              "weight": 5.0
-            },
-            {
-              "block": "minecraft:iron_ore",
-              "weight": 20.0
-            },
-            {
-              "block": "minecraft:gold_ore",
-              "weight": 10.0
-            },
-            {
-              "block": "minecraft:redstone_ore",
-              "weight": 9.0
-            },
-            {
-              "block": "minecraft:diamond_ore",
-              "weight": 1.0
-            },
-            {
-              "block": "minecraft:oak_log",
-              "weight": 100.0
-            },
-            {
-              "block": "minecraft:oak_leaves",
-              "weight": 40.0
-            },
-            {
-              "block": "minecraft:glass",
-              "weight": 1.0
-            },
-            {
-              "block": "minecraft:redstone_ore",
-              "weight": 8.0
-            },
-            {
-              "block": "minecraft:sandstone",
-              "weight": 10.0
-            },
-            {
-              "block": "minecraft:sticky_piston",
-              "weight": 1.0
-            },
-            {
-              "block": "minecraft:cobweb",
-              "weight": 10.0
-            },
-            {
-              "block": "minecraft:dead_bush",
-              "weight": 3.0
-            },
-            {
-              "block": "minecraft:piston",
-              "weight": 1.0
-            },
-            {
-              "block": "minecraft:white_wool",
-              "weight": 25.0
-            },
-            {
-              "block": "minecraft:dandelion",
-              "weight": 2.0
-            },
-            {
-              "block": "minecraft:poppy",
-              "weight": 2.0
-            },
-            {
-              "block": "minecraft:brown_mushroom",
-              "weight": 2.0
-            },
-            {
-              "block": "minecraft:red_mushroom",
-              "weight": 2.0
-            },
-            {
-              "block": "minecraft:tnt",
-              "weight": 2.0
-            },
-            {
-              "block": "minecraft:bookshelf",
-              "weight": 3.0
-            },
-            {
-              "block": "minecraft:mossy_cobblestone",
-              "weight": 5.0
-            },
-            {
-              "block": "minecraft:obsidian",
-              "weight": 5.0
-            },
-            {
-              "block": "minecraft:spawner",
-              "weight": 1.0
-            },
-            {
-              "block": "minecraft:chest",
-              "weight": 1.0
-            },
-            {
-              "block": "minecraft:ice",
-              "weight": 4.0
-            },
-            {
-              "block": "minecraft:snow_block",
-              "weight": 8.0
-            },
-            {
-              "block": "minecraft:cactus",
-              "weight": 1.0
-            },
-            {
-              "block": "minecraft:clay",
-              "weight": 20.0
-            },
-            {
-              "block": "minecraft:sugar_cane",
-              "weight": 15.0
-            },
-            {
-              "block": "minecraft:pumpkin",
-              "weight": 5.0
-            },
-            {
-              "block": "minecraft:melon",
-              "weight": 5.0
-            },
-            {
-              "block": "minecraft:mycelium",
-              "weight": 15.0
+    "dimensions": {
+        "minecraft:overworld": {
+            "type": "minecraft:overworld",
+            "generator": {
+                "type": "skygrid:skygrid",
+                "biome_source": {
+                    "type": "minecraft:fixed",
+                    "biome": "minecraft:the_void"
+                },
+                "settings": {
+                    "blocks": {
+                        "minecraft:stone": 120.0,
+                        "minecraft:grass_block": 80.0,
+                        "minecraft:dirt": 20.0,
+                        "minecraft:water": 10.0,
+                        "minecraft:lava": 5.0,
+                        "minecraft:sand": 20.0,
+                        "minecraft:gravel": 10.0,
+                        "minecraft:coal_ore": 40.0,
+                        "minecraft:lapis_ore": 5.0,
+                        "minecraft:iron_ore": 20.0,
+                        "minecraft:gold_ore": 10.0,
+                        "minecraft:redstone_ore": 8.0,
+                        "minecraft:diamond_ore": 1.0,
+                        "minecraft:oak_log": 100.0,
+                        "minecraft:oak_leaves": 40.0,
+                        "minecraft:glass": 1.0,
+                        "minecraft:sandstone": 10.0,
+                        "minecraft:sticky_piston": 1.0,
+                        "minecraft:cobweb": 10.0,
+                        "minecraft:dead_bush": 3.0,
+                        "minecraft:piston": 1.0,
+                        "minecraft:white_wool": 25.0,
+                        "minecraft:dandelion": 2.0,
+                        "minecraft:poppy": 2.0,
+                        "minecraft:brown_mushroom": 2.0,
+                        "minecraft:red_mushroom": 2.0,
+                        "minecraft:tnt": 2.0,
+                        "minecraft:bookshelf": 3.0,
+                        "minecraft:mossy_cobblestone": 5.0,
+                        "minecraft:obsidian": 5.0,
+                        "minecraft:spawner": 1.0,
+                        "minecraft:chest": 1.0,
+                        "minecraft:ice": 4.0,
+                        "minecraft:snow_block": 8.0,
+                        "minecraft:cactus": 1.0,
+                        "minecraft:clay": 20.0,
+                        "minecraft:sugar_cane": 15.0,
+                        "minecraft:pumpkin": 5.0,
+                        "minecraft:melon": 5.0,
+                        "minecraft:mycelium": 15.0
+                    },
+                    "spawner_entities": [
+                        "minecraft:creeper",
+                        "minecraft:skeleton",
+                        "minecraft:spider",
+                        "minecraft:cave_spider",
+                        "minecraft:zombie",
+                        "minecraft:slime",
+                        "minecraft:pig",
+                        "minecraft:sheep",
+                        "minecraft:cow",
+                        "minecraft:chicken",
+                        "minecraft:squid",
+                        "minecraft:wolf",
+                        "minecraft:enderman",
+                        "minecraft:silverfish",
+                        "minecraft:villager"
+                    ]
+                }
             }
-          ],
-          "spawner_entities": [
-            "minecraft:creeper",
-            "minecraft:skeleton",
-            "minecraft:spider",
-            "minecraft:cave_spider",
-            "minecraft:zombie",
-            "minecraft:slime",
-            "minecraft:pig",
-            "minecraft:sheep",
-            "minecraft:cow",
-            "minecraft:chicken",
-            "minecraft:squid",
-            "minecraft:wolf",
-            "minecraft:enderman",
-            "minecraft:silverfish",
-            "minecraft:villager"
-          ]
-        }
-      }
-    },
-    "minecraft:the_end": {
-      "type": "minecraft:the_end",
-      "generator": {
-        "type": "skygrid:skygrid",
-        "biome_source": {
-          "type": "minecraft:fixed",
-          "biome": "minecraft:the_void"
         },
-        "settings": {
-          "blocks": [
-            {
-              "block": "minecraft:end_stone",
-              "weight": 1.0
+        "minecraft:the_end": {
+            "type": "minecraft:the_end",
+            "generator": {
+                "type": "skygrid:skygrid",
+                "biome_source": {
+                    "type": "minecraft:fixed",
+                    "biome": "minecraft:the_void"
+                },
+                "settings": {
+                    "blocks": {
+                        "minecraft:end_stone": 1.0
+                    },
+                    "spawner_entities": []
+                }
             }
-          ],
-          "spawner_entities": []
-        }
-      }
-    },
-    "minecraft:the_nether": {
-      "type": "minecraft:the_nether",
-      "generator": {
-        "type": "skygrid:skygrid",
-        "biome_source": {
-          "type": "minecraft:fixed",
-          "biome": "minecraft:the_void"
         },
-        "settings": {
-          "blocks": [
-            {
-              "block": "minecraft:lava",
-              "weight": 50.0
-            },
-            {
-              "block": "minecraft:gravel",
-              "weight": 30.0
-            },
-            {
-              "block": "minecraft:spawner",
-              "weight": 2.0
-            },
-            {
-              "block": "minecraft:netherrack",
-              "weight": 300.0
-            },
-            {
-              "block": "minecraft:soul_sand",
-              "weight": 100.0
-            },
-            {
-              "block": "minecraft:glowstone",
-              "weight": 50.0
-            },
-            {
-              "block": "minecraft:nether_bricks",
-              "weight": 30.0
-            },
-            {
-              "block": "minecraft:nether_brick_fence",
-              "weight": 10.0
-            },
-            {
-              "block": "minecraft:nether_brick_stairs",
-              "weight": 15.0
-            },
-            {
-              "block": "nether_wart",
-              "weight": 30.0
+        "minecraft:the_nether": {
+            "type": "minecraft:the_nether",
+            "generator": {
+                "type": "skygrid:skygrid",
+                "biome_source": {
+                    "type": "minecraft:fixed",
+                    "biome": "minecraft:the_void"
+                },
+                "settings": {
+                    "blocks": {
+                        "minecraft:lava": 50.0,
+                        "minecraft:gravel": 30.0,
+                        "minecraft:spawner": 2.0,
+                        "minecraft:netherrack": 300.0,
+                        "minecraft:soul_sand": 100.0,
+                        "minecraft:glowstone": 50.0,
+                        "minecraft:nether_bricks": 30.0,
+                        "minecraft:nether_brick_fence": 10.0,
+                        "minecraft:nether_brick_stairs": 15.0,
+                        "nether_wart": 30.0
+                    },
+                    "spawner_entities": [
+                        "minecraft:zombified_piglin",
+                        "minecraft:blaze",
+                        "minecraft:magma_cube"
+                    ]
+                }
             }
-          ],
-          "spawner_entities": [
-            "minecraft:zombified_piglin",
-            "minecraft:blaze",
-            "minecraft:magma_cube"
-          ]
         }
-      }
     }
-  }
 }

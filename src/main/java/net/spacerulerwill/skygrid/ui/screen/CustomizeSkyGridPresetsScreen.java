@@ -11,12 +11,9 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.spacerulerwill.skygrid.ui.util.RenderUtils;
+import net.spacerulerwill.skygrid.SkyGrid;
 import net.spacerulerwill.skygrid.worldgen.SkyGridPreset;
-import net.spacerulerwill.skygrid.worldgen.SkyGridPresets;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Supplier;
 
 public class CustomizeSkyGridPresetsScreen extends Screen {
     private final CustomizeSkyGridScreen parent;
@@ -63,8 +60,8 @@ public class CustomizeSkyGridPresetsScreen extends Screen {
         public SkyGridPresetListWidget() {
             super(CustomizeSkyGridPresetsScreen.this.client, CustomizeSkyGridPresetsScreen.this.width, CustomizeSkyGridPresetsScreen.this.height - 77, 33, 24);
 
-            for (Supplier<SkyGridPreset> preset : SkyGridPresets.ALL_PRESETS) {
-                this.addEntry(new SkyGridPresetEntry(preset.get()));
+            for (SkyGridPreset preset : SkyGrid.presets) {
+                this.addEntry(new SkyGridPresetEntry(preset));
             }
         }
 
@@ -90,8 +87,8 @@ public class CustomizeSkyGridPresetsScreen extends Screen {
             @Override
             public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
                 context.drawGuiTexture(RenderLayer::getGuiTextured, SLOT_TEXTURE, x + 1, y + 1, 0, 18, 18);
-                context.drawItemWithoutEntity(preset.item.getDefaultStack(), x + 2, y + 2);
-                context.drawText(CustomizeSkyGridPresetsScreen.this.textRenderer, Text.translatable(preset.name), x + 18 + 5, y + 3, 16777215, false);
+                context.drawItemWithoutEntity(preset.item().getDefaultStack(), x + 2, y + 2);
+                context.drawText(CustomizeSkyGridPresetsScreen.this.textRenderer, Text.translatable(preset.name()), x + 18 + 5, y + 3, 16777215, false);
             }
         }
     }

@@ -1,0 +1,33 @@
+{
+  "item": "minecraft:tnt",
+  "name": "Boom!",
+  "overworld_config": {
+    "blocks": {
+      "minecraft:tnt": 100,
+      "minecraft:spawner": 1
+    },
+    "spawner_entities": [
+      "minecraft:creeper"
+    ]
+  },
+  "nether_config": {
+    "blocks": {
+      "minecraft:tnt": 100,
+      "minecraft:spawner": 1
+    },
+    "spawner_entities": [
+      "minecraft:blaze",
+      "minecraft:ghast"
+    ]
+  },
+  "end_config": {
+    "blocks": {
+      "minecraft:tnt": 100,
+      "minecraft:spawner": 1
+    },
+    "spawner_entities": [
+      "minecraft:endermite",
+      "minecraft:enderman"
+    ]
+  }
+}

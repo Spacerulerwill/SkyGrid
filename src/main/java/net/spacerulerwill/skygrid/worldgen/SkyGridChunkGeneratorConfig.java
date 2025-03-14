@@ -5,31 +5,20 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityType;
 import net.minecraft.registry.Registries;
+import net.minecraft.text.Style;
+import net.minecraft.util.dynamic.Codecs;
 import net.spacerulerwill.skygrid.util.BlockWeight;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public record SkyGridChunkGeneratorConfig(LinkedHashMap<Block, Integer> blocks, LinkedHashSet<EntityType<?>> spawnerEntities) {
+public record SkyGridChunkGeneratorConfig(Map<Block, Integer> blocks, LinkedHashSet<EntityType<?>> spawnerEntities) {
+
+    static Codec<Map<Block, Integer>> BLOCK_WEIGHT_MAP_CODEC = Codec.unboundedMap(Registries.BLOCK.getCodec(), Codecs.POSITIVE_INT);
     public static final Codec<SkyGridChunkGeneratorConfig> CODEC = RecordCodecBuilder.create(
             instance -> instance.group(
                     // Custom codec for blocks
-                    Codec.list(BlockWeight.CODEC).fieldOf("blocks")
-                            .xmap(
-                                    list -> list.stream()
-                                            .collect(Collectors.toMap(
-                                                    BlockWeight::block,  // Block is the key
-                                                    BlockWeight::weight, // Double is the value
-                                                    (existing, replacement) -> existing,  // Resolve conflicts (if any)
-                                                    LinkedHashMap::new  // Preserve insertion order
-                                            )),
-                                    map -> map.entrySet().stream()
-                                            .map(entry -> new BlockWeight(entry.getKey(), entry.getValue()))
-                                            .collect(Collectors.toList())
-                            )
-                            .forGetter(SkyGridChunkGeneratorConfig::blocks),
-
-                    // Codec for spawner entities
+                    BLOCK_WEIGHT_MAP_CODEC.fieldOf("blocks").forGetter(SkyGridChunkGeneratorConfig::blocks),
                     Registries.ENTITY_TYPE.getCodec().listOf().fieldOf("spawner_entities")
                             .xmap(
                                     LinkedHashSet::new,  // Convert List to LinkedHashSet

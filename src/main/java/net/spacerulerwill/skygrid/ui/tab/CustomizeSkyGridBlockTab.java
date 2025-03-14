@@ -99,7 +99,7 @@ public class CustomizeSkyGridBlockTab extends CustomizeSkyGridTab<CustomizeSkyGr
         @Override
         public void refreshEntries() {
             this.clearEntries();
-            LinkedHashMap<Block, Integer> blocks = this.parent.getCurrentConfig().blocks();
+            Map<Block, Integer> blocks = this.parent.getCurrentConfig().blocks();
             for (Map.Entry<Block, Integer> entry : blocks.entrySet()) {
                 Block block = entry.getKey();
                 int weight = entry.getValue();

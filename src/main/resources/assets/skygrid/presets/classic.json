@@ -1,0 +1,88 @@
+{
+  "item": "minecraft:grass_block",
+  "name": "Classic",
+  "overworld_config": {
+    "blocks": {
+      "minecraft:stone": 100,
+      "minecraft:grass_block": 120,
+      "minecraft:dirt": 20,
+      "minecraft:water": 10,
+      "minecraft:lava": 5,
+      "minecraft:sand": 20,
+      "minecraft:gravel": 10,
+      "minecraft:coal_ore": 40,
+      "minecraft:lapis_ore": 5,
+      "minecraft:iron_ore": 20,
+      "minecraft:gold_ore": 10,
+      "minecraft:redstone_ore": 9,
+      "minecraft:diamond_ore": 1,
+      "minecraft:oak_log": 100,
+      "minecraft:oak_leaves": 40,
+      "minecraft:glass": 1,
+      "minecraft:sandstone": 10,
+      "minecraft:sticky_piston": 1,
+      "minecraft:cobweb": 10,
+      "minecraft:dead_bush": 3,
+      "minecraft:piston": 1,
+      "minecraft:white_wool": 25,
+      "minecraft:dandelion": 2,
+      "minecraft:poppy": 2,
+      "minecraft:brown_mushroom": 2,
+      "minecraft:red_mushroom": 2,
+      "minecraft:mossy_cobblestone": 5,
+      "minecraft:obsidian": 5,
+      "minecraft:spawner": 1,
+      "minecraft:chest": 1,
+      "minecraft:ice": 4,
+      "minecraft:snow_block": 8,
+      "minecraft:cactus": 1,
+      "minecraft:clay": 20,
+      "minecraft:sugar_cane": 15,
+      "minecraft:pumpkin": 5,
+      "minecraft:melon": 5,
+      "minecraft:mycelium": 15
+    },
+    "spawner_entities": [
+      "minecraft:creeper",
+      "minecraft:skeleton",
+      "minecraft:spider",
+      "minecraft:cave_spider",
+      "minecraft:zombie",
+      "minecraft:slime",
+      "minecraft:pig",
+      "minecraft:sheep",
+      "minecraft:cow",
+      "minecraft:chicken",
+      "minecraft:squid",
+      "minecraft:wolf",
+      "minecraft:enderman",
+      "minecraft:silverfish",
+      "minecraft:villager"
+    ]
+  },
+  "nether_config": {
+    "blocks": {
+      "minecraft:lava": 50,
+      "minecraft:gravel": 30,
+      "minecraft:spawner": 2,
+      "minecraft:netherrack": 300,
+      "minecraft:soul_sand": 100,
+      "minecraft:glowstone": 50,
+      "minecraft:nether_bricks": 30,
+      "minecraft:nether_brick_fence": 10,
+      "minecraft:nether_brick_stairs": 15,
+      "minecraft:nether_wart": 30
+    },
+    "spawner_entities": [
+      "minecraft:zombified_piglin",
+      "minecraft:blaze",
+      "minecraft:magma_cube"
+    ]
+  },
+  "end_config": {
+    "blocks": {
+      "minecraft:end_stone": 1
+    },
+    "spawner_entities": []
+  }
+}

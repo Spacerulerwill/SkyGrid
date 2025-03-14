@@ -10,7 +10,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.ScreenRect;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.world.CreateWorldScreen;
-import net.minecraft.client.gui.screen.world.CustomizeFlatLevelScreen;
 import net.minecraft.client.gui.tab.Tab;
 import net.minecraft.client.gui.tab.TabManager;
 import net.minecraft.client.gui.widget.*;
@@ -31,6 +30,7 @@ import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.WorldPreset;
 import net.minecraft.world.gen.WorldPresets;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.spacerulerwill.skygrid.SkyGrid;
 import net.spacerulerwill.skygrid.ui.tab.CustomizeSkyGridBlockTab;
 import net.spacerulerwill.skygrid.ui.tab.CustomizeSkyGridMobSpawnerTab;
 import net.spacerulerwill.skygrid.ui.tab.CustomizeSkyGridTab;
@@ -38,7 +38,6 @@ import net.spacerulerwill.skygrid.util.WorldPresetExtension;
 import net.spacerulerwill.skygrid.worldgen.SkyGridChunkGenerator;
 import net.spacerulerwill.skygrid.worldgen.SkyGridChunkGeneratorConfig;
 import net.spacerulerwill.skygrid.worldgen.SkyGridPreset;
-import net.spacerulerwill.skygrid.worldgen.SkyGridPresets;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
@@ -77,10 +76,10 @@ public class CustomizeSkyGridScreen extends Screen {
         this.parent = parent;
         // Add initial dimension configs (default values for vanilla dimensions)
         this.dimensionChunkGeneratorConfigs = new HashMap<>();
-        SkyGridPreset classic = SkyGridPresets.getClassicPreset();
-        this.dimensionChunkGeneratorConfigs.put(DimensionOptions.OVERWORLD, classic.overworldConfig);
-        this.dimensionChunkGeneratorConfigs.put(DimensionOptions.NETHER, classic.netherConfig);
-        this.dimensionChunkGeneratorConfigs. put(DimensionOptions.END, classic.endConfig);
+
+        this.dimensionChunkGeneratorConfigs.put(DimensionOptions.OVERWORLD, SkyGrid.defaultPreset.overworldConfig());
+        this.dimensionChunkGeneratorConfigs.put(DimensionOptions.NETHER, SkyGrid.defaultPreset.netherConfig());
+        this.dimensionChunkGeneratorConfigs. put(DimensionOptions.END, SkyGrid.defaultPreset.endConfig());
         // Array of dimensions options registry keys
         this.currentDimension = DimensionOptions.OVERWORLD;
         this.dimensions.add(DimensionOptions.OVERWORLD);
@@ -203,9 +202,9 @@ public class CustomizeSkyGridScreen extends Screen {
     }
 
     public void setConfigFromPreset(SkyGridPreset preset) {
-        this.dimensionChunkGeneratorConfigs.put(DimensionOptions.OVERWORLD, preset.overworldConfig);
-        this.dimensionChunkGeneratorConfigs.put(DimensionOptions.NETHER, preset.netherConfig);
-        this.dimensionChunkGeneratorConfigs.put(DimensionOptions.END, preset.endConfig);
+        this.dimensionChunkGeneratorConfigs.put(DimensionOptions.OVERWORLD, preset.overworldConfig());
+        this.dimensionChunkGeneratorConfigs.put(DimensionOptions.NETHER, preset.netherConfig());
+        this.dimensionChunkGeneratorConfigs.put(DimensionOptions.END, preset.endConfig());
         this.blockTab.reset();
         this.mobSpawnerTab.reset();
     }

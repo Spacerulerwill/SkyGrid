@@ -8,6 +8,9 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.block.entity.MobSpawnerBlockEntity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
@@ -24,9 +27,7 @@ import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.chunk.VerticalBlockSample;
 import net.minecraft.world.gen.noise.NoiseConfig;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 import net.spacerulerwill.skygrid.util.MinecraftRandomAdapter;
@@ -51,7 +52,7 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
         this.entities = config.spawnerEntities().stream().toList();
     }
 
-    private DiscreteProbabilityCollectionSampler<Block> createBlockProbabilities(LinkedHashMap<Block, Integer> blockWeights) {
+    private DiscreteProbabilityCollectionSampler<Block> createBlockProbabilities(Map<Block, Integer> blockWeights) {
         // Calculate the total weight
         int totalWeight = 0;
         for (Integer value : blockWeights.values()) {
