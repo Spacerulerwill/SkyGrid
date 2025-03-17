@@ -164,7 +164,7 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
 
                         if (this.chestItemProbabilities != null) {
                             // How many items for chest
-                            int numItems = random.nextBetween(0, 5);
+                            int numItems = random.nextBetween(2, 5);
                             // Generate 26 numbers and shuffle them
                             ArrayList<Integer> slots = new ArrayList<>();
                             for (int i = 0; i <= 26; i++) {
