@@ -3,6 +3,7 @@ package net.spacerulerwill.skygrid.ui.screen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
@@ -13,7 +14,10 @@ import net.minecraft.world.dimension.DimensionOptions;
 import net.spacerulerwill.skygrid.ui.widget.WeightSliderListWidgetEntry;
 import net.spacerulerwill.skygrid.worldgen.SkyGridConfig;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class CustomizeBlocksScreen extends DimensionSpecificCustomizableListWidgetScreen<CustomizeBlocksScreen.BlockWeightListEntry, Block> {
     private static final int INITIAL_BLOCK_WEIGHT = 160;
@@ -22,6 +26,16 @@ public class CustomizeBlocksScreen extends DimensionSpecificCustomizableListWidg
 
     public CustomizeBlocksScreen(CustomizeSkyGridScreen parent, SkyGridConfig currentConfig) {
         super(parent, currentConfig, Text.translatable("createWorld.customize.skygrid.blocks"), Text.translatable("createWorld.customize.skygrid.blocks.placeholder"), 25);
+    }
+
+    private static Item getBlockItem(Block block) {
+        if (block.equals(Blocks.LAVA)) {
+            return Items.LAVA_BUCKET;
+        } else if (block.equals(Blocks.WATER)) {
+            return Items.WATER_BUCKET;
+        } else {
+            return block.asItem();
+        }
     }
 
     @Override
@@ -46,12 +60,10 @@ public class CustomizeBlocksScreen extends DimensionSpecificCustomizableListWidg
             return results;
         }
         Registries.BLOCK.forEach(block -> {
-            if (block.asItem() == Items.AIR) return;
-
             String displayString = Text.translatable(block.getTranslationKey()).getString();
             String valueString = Registries.BLOCK.getId(block).toString();
             if (displayString.trim().toLowerCase().startsWith(text) || valueString.startsWith(text)) {
-                results.add(new AutocompleteListWidget.Entry(block.asItem(), displayString, valueString, this.textRenderer));
+                results.add(new AutocompleteListWidget.Entry(getBlockItem(block), displayString, valueString, this.textRenderer));
             }
         });
         return results;
@@ -126,7 +138,7 @@ public class CustomizeBlocksScreen extends DimensionSpecificCustomizableListWidg
 
         @Override
         public Item getIcon() {
-            return this.block.asItem();
+            return getBlockItem(this.block);
         }
     }
 }
