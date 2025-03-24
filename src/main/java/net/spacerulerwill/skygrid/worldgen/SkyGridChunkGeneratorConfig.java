@@ -11,6 +11,14 @@ import net.minecraft.util.dynamic.Codecs;
 import java.util.*;
 
 public record SkyGridChunkGeneratorConfig(Map<Block, Integer> blocks, LinkedHashSet<EntityType<?>> spawnerEntities, Map<Item, Integer> chestItems) {
+    public SkyGridChunkGeneratorConfig(SkyGridChunkGeneratorConfig other) {
+        this(
+                new LinkedHashMap<>(other.blocks),
+                new LinkedHashSet<>(other.spawnerEntities),
+                new LinkedHashMap<>(other.chestItems)
+        );
+    }
+
     static Codec<Map<Block, Integer>> BLOCK_WEIGHT_MAP_CODEC = Codec.unboundedMap(Registries.BLOCK.getCodec(), Codecs.POSITIVE_INT)
             .xmap(HashMap::new, map -> map);
     static Codec<Map<Item, Integer>> ITEM_WEIGHT_MAP_CODEC = Codec.unboundedMap(Registries.ITEM.getCodec(), Codecs.POSITIVE_INT)

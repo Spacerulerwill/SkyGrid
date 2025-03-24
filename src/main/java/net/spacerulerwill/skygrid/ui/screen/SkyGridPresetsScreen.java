@@ -60,7 +60,7 @@ public class SkyGridPresetsScreen extends Screen {
         public SkyGridPresetListWidget() {
             super(SkyGridPresetsScreen.this.client, SkyGridPresetsScreen.this.width, SkyGridPresetsScreen.this.height - 77, 33, 24);
 
-            for (SkyGridPreset preset : SkyGrid.presets) {
+            for (SkyGridPreset preset : SkyGrid.PRESETS) {
                 this.addEntry(new SkyGridPresetEntry(preset));
             }
         }
@@ -74,14 +74,15 @@ public class SkyGridPresetsScreen extends Screen {
         @Environment(EnvType.CLIENT)
         public class SkyGridPresetEntry extends Entry<SkyGridPresetEntry> {
             private static final Identifier SLOT_TEXTURE = Identifier.ofVanilla("container/slot");
-            private SkyGridPreset preset;
+            private final SkyGridPreset preset;
 
             public SkyGridPresetEntry(SkyGridPreset preset) {
                 this.preset = preset;
             }
+
             @Override
             public Text getNarration() {
-                return Text.of("bruh");
+                return Text.empty();
             }
 
             @Override

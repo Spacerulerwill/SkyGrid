@@ -1,36 +1,38 @@
 {
   "item": "minecraft:tnt",
   "name": "Boom!",
-  "overworld_config": {
-    "blocks": {
-      "minecraft:tnt": 100,
-      "minecraft:spawner": 1
+  "config": {
+    "overworld_config": {
+      "blocks": {
+        "minecraft:tnt": 100,
+        "minecraft:spawner": 1
+      },
+      "spawner_entities": [
+        "minecraft:creeper"
+      ],
+      "chest_items": {}
     },
-    "spawner_entities": [
-      "minecraft:creeper"
-    ],
-    "chest_items": {}
-  },
-  "nether_config": {
-    "blocks": {
-      "minecraft:tnt": 100,
-      "minecraft:spawner": 1
+    "nether_config": {
+      "blocks": {
+        "minecraft:tnt": 100,
+        "minecraft:spawner": 1
+      },
+      "spawner_entities": [
+        "minecraft:blaze",
+        "minecraft:ghast"
+      ],
+      "chest_items": {}
     },
-    "spawner_entities": [
-      "minecraft:blaze",
-      "minecraft:ghast"
-    ],
-    "chest_items": {}
-  },
-  "end_config": {
-    "blocks": {
-      "minecraft:tnt": 100,
-      "minecraft:spawner": 1
-    },
-    "spawner_entities": [
-      "minecraft:endermite",
-      "minecraft:enderman"
-    ],
-    "chest_items": {}
+    "end_config": {
+      "blocks": {
+        "minecraft:tnt": 100,
+        "minecraft:spawner": 1
+      },
+      "spawner_entities": [
+        "minecraft:endermite",
+        "minecraft:enderman"
+      ],
+      "chest_items": {}
+    }
   }
 }
