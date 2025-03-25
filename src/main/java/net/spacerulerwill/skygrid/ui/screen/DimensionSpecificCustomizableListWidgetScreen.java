@@ -33,13 +33,13 @@ public abstract class DimensionSpecificCustomizableListWidgetScreen<T extends Al
     private final int entryHeight;
     protected ListWidget listWidget;
     protected TextField textField;
+    protected RegistryKey<DimensionOptions> currentDimension;
+    protected SkyGridConfig currentConfig;
     private ButtonWidget addButton;
     private ButtonWidget deleteButton;
     private CyclingButtonWidget<RegistryKey<DimensionOptions>> dimensionsSelector;
     private ButtonWidget doneButton;
     private ButtonWidget cancelButton;
-    protected RegistryKey<DimensionOptions> currentDimension;
-    protected SkyGridConfig currentConfig;
 
     public DimensionSpecificCustomizableListWidgetScreen(CustomizeSkyGridScreen parent, SkyGridConfig currentConfig, Text title, Text textFieldPlaceholder, int entryHeight) {
         super(title);
@@ -167,12 +167,84 @@ public abstract class DimensionSpecificCustomizableListWidgetScreen<T extends Al
     }
 
     protected abstract void onClear();
+
     protected abstract Optional<V> getFromTextField(String text);
+
     protected abstract List<AutocompleteListWidget.Entry> getAutocompleteSuggestions(String text);
+
     protected abstract void onAdd(V thing);
+
     protected abstract boolean canAdd(V thing);
+
     protected abstract void onDelete(T entry);
+
     protected abstract List<T> getEntriesFromConfig();
+
+    @Environment(EnvType.CLIENT)
+    public static class AutocompleteListWidget extends AlwaysSelectedEntryListWidget<AutocompleteListWidget.Entry> {
+        DimensionSpecificCustomizableListWidgetScreen<?, ?> parent;
+
+        public AutocompleteListWidget(MinecraftClient minecraftClient, DimensionSpecificCustomizableListWidgetScreen<?, ?> parent) {
+            super(minecraftClient, 158, 44, 0, 24);
+            this.parent = parent;
+        }
+
+        @Override
+        public int getRowWidth() {
+            return this.getWidth() - 16;
+        }
+
+        @Override
+        protected int getScrollbarX() {
+            return this.getX() + this.getWidth() - 6;
+        }
+
+        @Override
+        public void setSelected(@Nullable DimensionSpecificCustomizableListWidgetScreen.AutocompleteListWidget.Entry entry) {
+            super.setSelected(entry);
+            if (entry != null) {
+                this.parent.textField.setText(entry.valueText);
+            }
+        }
+
+        @Override
+        public void setSelected(int index) {
+            super.setSelected(index);
+            AutocompleteListWidget.Entry entry = this.getEntry(index);
+            this.parent.textField.setText(entry.valueText);
+        }
+
+        @Environment(EnvType.CLIENT)
+        public static class Entry extends AlwaysSelectedEntryListWidget.Entry<Entry> {
+            public final String valueText;
+            @Nullable
+            private final Item iconItem;
+            private final String displayText;
+            private final TextRenderer textRenderer;
+
+            public Entry(@Nullable Item iconItem, String displayText, String valueText, TextRenderer textRenderer) {
+                this.iconItem = iconItem;
+                this.displayText = displayText;
+                this.valueText = valueText;
+                this.textRenderer = textRenderer;
+            }
+
+            @Override
+            public Text getNarration() {
+                return Text.empty();
+            }
+
+            @Override
+            public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+                if (this.iconItem == null) {
+                    context.drawText(this.textRenderer, this.displayText, x + 5, y + 3, 16777215, false);
+                } else {
+                    RenderUtils.renderItemIcon(this.iconItem, context, x, y);
+                    context.drawText(this.textRenderer, this.displayText, x + 18 + 5, y + 3, 16777215, false);
+                }
+            }
+        }
+    }
 
     @Environment(EnvType.CLIENT)
     protected class ListWidget extends AlwaysSelectedEntryListWidget<T> {
@@ -200,6 +272,7 @@ public abstract class DimensionSpecificCustomizableListWidgetScreen<T extends Al
 
         public TextField(TextRenderer textRenderer, int x, int y, Text text) {
             super(textRenderer, x, y, text);
+            this.setMaxLength(1024);
         }
 
         private void refreshPositions() {
@@ -253,72 +326,6 @@ public abstract class DimensionSpecificCustomizableListWidgetScreen<T extends Al
                     this.autocompleteListWidget.replaceEntries(autocompleteResults);
                 }
 
-            }
-        }
-    }
-
-    @Environment(EnvType.CLIENT)
-    public static class AutocompleteListWidget extends AlwaysSelectedEntryListWidget<AutocompleteListWidget.Entry> {
-        DimensionSpecificCustomizableListWidgetScreen<?, ?> parent;
-
-        public AutocompleteListWidget(MinecraftClient minecraftClient, DimensionSpecificCustomizableListWidgetScreen<?, ?> parent) {
-            super(minecraftClient, 158, 44, 0, 24);
-            this.parent = parent;
-        }
-
-        @Override
-        public int getRowWidth() {
-            return this.getWidth() - 16;
-        }
-
-        @Override
-        protected int getScrollbarX() {
-            return this.getX() + this.getWidth() - 6;
-        }
-
-        @Override
-        public void setSelected(@Nullable DimensionSpecificCustomizableListWidgetScreen.AutocompleteListWidget.Entry entry) {
-            super.setSelected(entry);
-            if (entry != null) {
-                this.parent.textField.setText(entry.valueText);
-            }
-        }
-
-        @Override
-        public void setSelected(int index) {
-            super.setSelected(index);
-            AutocompleteListWidget.Entry entry = this.getEntry(index);
-            this.parent.textField.setText(entry.valueText);
-        }
-
-        @Environment(EnvType.CLIENT)
-        public static class Entry extends AlwaysSelectedEntryListWidget.Entry<Entry> {
-            @Nullable
-            private final Item iconItem;
-            private final String displayText;
-            public final String valueText;
-            private final TextRenderer textRenderer;
-
-            public Entry(@Nullable Item iconItem, String displayText, String valueText, TextRenderer textRenderer) {
-                this.iconItem = iconItem;
-                this.displayText = displayText;
-                this.valueText = valueText;
-                this.textRenderer = textRenderer;
-            }
-
-            @Override
-            public Text getNarration() {
-                return Text.empty();
-            }
-
-            @Override
-            public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-                if (this.iconItem == null) {
-                    context.drawText(this.textRenderer, this.displayText, x + 5, y + 3, 16777215, false);
-                } else {
-                    RenderUtils.renderItemIcon(this.iconItem, context, x, y);
-                    context.drawText(this.textRenderer, this.displayText, x + 18 + 5, y + 3, 16777215, false);
-                }
             }
         }
     }
