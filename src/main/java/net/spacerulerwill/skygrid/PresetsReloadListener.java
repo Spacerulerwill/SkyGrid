@@ -36,7 +36,7 @@ public class PresetsReloadListener implements SimpleSynchronousResourceReloadLis
                 }
                 SkyGrid.LOGGER.info("Loaded preset {}", identifier);
             } catch (Exception e) {
-                SkyGrid.LOGGER.error("Error occurred while loading preset json {}", identifier, e);
+                SkyGrid.LOGGER.error("Error occurred while loading preset json: {}", identifier, e);
             }
         }
         SkyGrid.LOGGER.info("Loaded presets");

@@ -111,6 +111,10 @@ public class CustomizeSkyGridScreen extends Screen {
         this.currentConfig = config;
     }
 
+    public SkyGridConfig getCurrentSkyGridConfig() {
+        return this.currentConfig;
+    }
+
     private void done() {
         this.parent.getWorldCreator().applyModifier(applyChunkCGeneratorConfigs());
     }

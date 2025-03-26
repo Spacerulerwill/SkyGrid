@@ -13,9 +13,9 @@ import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.world.dimension.DimensionOptions;
 import net.spacerulerwill.skygrid.ui.util.RenderUtils;
+import net.spacerulerwill.skygrid.ui.widget.TextField;
 import net.spacerulerwill.skygrid.worldgen.SkyGridConfig;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +32,7 @@ public abstract class DimensionSpecificCustomizableListWidgetScreen<T extends Al
     private final CustomizeSkyGridScreen parent;
     private final int entryHeight;
     protected ListWidget listWidget;
-    protected TextField textField;
+    protected SearchTextField textField;
     protected RegistryKey<DimensionOptions> currentDimension;
     protected SkyGridConfig currentConfig;
     private ButtonWidget addButton;
@@ -97,7 +97,7 @@ public abstract class DimensionSpecificCustomizableListWidgetScreen<T extends Al
         }).width(75).build());
         // Row 3 - Text field and Add button
         DirectionalLayoutWidget row3 = DirectionalLayoutWidget.horizontal().spacing(8);
-        this.textField = row3.add(new TextField(textRenderer, 158, 20, this.textFieldPlaceholder));
+        this.textField = row3.add(new SearchTextField(textRenderer, 158, 20, this.textFieldPlaceholder));
         this.addButton = row3.add(ButtonWidget.builder(Text.translatable("createWorld.customize.skygrid.add"), (button) -> {
             Optional<V> v = this.getFromTextField(this.textField.getText());
             v.ifPresent(this::onAdd);
@@ -266,11 +266,11 @@ public abstract class DimensionSpecificCustomizableListWidgetScreen<T extends Al
     }
 
     @Environment(EnvType.CLIENT)
-    protected class TextField extends TextFieldWidget {
+    protected class SearchTextField extends TextField {
         @Nullable
         public AutocompleteListWidget autocompleteListWidget;
 
-        public TextField(TextRenderer textRenderer, int x, int y, Text text) {
+        public SearchTextField(TextRenderer textRenderer, int x, int y, Text text) {
             super(textRenderer, x, y, text);
             this.setMaxLength(1024);
         }
@@ -282,29 +282,7 @@ public abstract class DimensionSpecificCustomizableListWidgetScreen<T extends Al
             }
         }
 
-        @Override
-        public boolean charTyped(char chr, int modifiers) {
-            boolean result = super.charTyped(chr, modifiers);
-            this.onTextChanged();
-            return result;
-        }
-
-        @Override
-        public void setText(String text) {
-            super.setText(text);
-            this.onTextChanged();
-        }
-
-        @Override
-        public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-            boolean result = super.keyPressed(keyCode, scanCode, modifiers);
-            if (result && (keyCode == GLFW.GLFW_KEY_BACKSPACE || keyCode == GLFW.GLFW_KEY_DELETE)) {
-                this.onTextChanged();
-            }
-            return result;
-        }
-
-        private void onTextChanged() {
+        protected void onTextChanged() {
             DimensionSpecificCustomizableListWidgetScreen.this.updateAddButtonActive();
             List<AutocompleteListWidget.Entry> autocompleteResults = DimensionSpecificCustomizableListWidgetScreen.this.getAutocompleteSuggestions(this.getText());
             if (autocompleteResults.isEmpty()) {
