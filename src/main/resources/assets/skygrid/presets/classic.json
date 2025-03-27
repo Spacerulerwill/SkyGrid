@@ -196,9 +196,7 @@
       "chest_items": {}
     },
     "end_config": {
-      "blocks": {
-        "minecraft:end_stone": 1
-      },
+      "blocks": {},
       "spawner_entities": [],
       "chest_items": {}
     }

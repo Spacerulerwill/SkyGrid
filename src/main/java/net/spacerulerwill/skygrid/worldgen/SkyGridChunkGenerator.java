@@ -10,6 +10,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.ChunkRegion;
 import net.minecraft.world.HeightLimitView;
@@ -201,6 +202,28 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
                 }
             }
         }
+
+        // End portal placement
+        if (chunk.getPos().x == 0 && chunk.getPos().z == 0) {
+            chunk.setBlockState(new BlockPos(0, -64, 0), Blocks.AIR.getDefaultState(), false);
+            chunk.setBlockState(new BlockPos(2, -64, 0), Blocks.END_PORTAL_FRAME.getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.WEST), false);  // Face towards center (1, -64, 1)
+            chunk.setBlockState(new BlockPos(0, -64, 2), Blocks.END_PORTAL_FRAME.getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.NORTH), false); // Face towards center (1, -64, 1)
+            chunk.setBlockState(new BlockPos(2, -64, 1), Blocks.END_PORTAL_FRAME.getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.WEST), false); // Face towards center (1, -64, 1)
+            chunk.setBlockState(new BlockPos(1, -64, 2), Blocks.END_PORTAL_FRAME.getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.NORTH), false);  // Face towards center (1, -64, 1)
+        } else if (chunk.getPos().x == -1 && chunk.getPos().z == 0) {
+            chunk.setBlockState(new BlockPos(-2, -64, 0), Blocks.END_PORTAL_FRAME.getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.EAST), false);   // Face towards center (1, -64, 1)
+            chunk.setBlockState(new BlockPos(-2, -64, 1), Blocks.END_PORTAL_FRAME.getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.EAST), false);  // Face towards center (1, -64, 1)
+            chunk.setBlockState(new BlockPos(-1, -64, 2), Blocks.END_PORTAL_FRAME.getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.NORTH), false);  // Face towards center (1, -64, 1)
+        } else if (chunk.getPos().x == 0 && chunk.getPos().z == -1) {
+            chunk.setBlockState(new BlockPos(0, -64, -2), Blocks.END_PORTAL_FRAME.getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.SOUTH), false); // Face towards center (1, -64, 1)
+            chunk.setBlockState(new BlockPos(1, -64, -2), Blocks.END_PORTAL_FRAME.getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.SOUTH), false);  // Face towards center (1, -64, 1)
+            chunk.setBlockState(new BlockPos(2, -64, -1), Blocks.END_PORTAL_FRAME.getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.WEST), false); // Face towards center (1, -64, 1)
+        } else if (chunk.getPos().x == -1 && chunk.getPos().z == -1) {
+            chunk.setBlockState(new BlockPos(-2, -64, -1), Blocks.END_PORTAL_FRAME.getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.EAST), false);  // Face towards center (1, -64, 1)
+            chunk.setBlockState(new BlockPos(-1, -64, -2), Blocks.END_PORTAL_FRAME.getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.SOUTH), false);   // Face towards center (1, -64, 1)
+        }
+
+
         return CompletableFuture.completedFuture(chunk);
     }
 
