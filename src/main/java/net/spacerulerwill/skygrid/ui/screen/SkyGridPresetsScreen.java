@@ -27,8 +27,10 @@ import net.spacerulerwill.skygrid.worldgen.SkyGridConfig;
 import net.spacerulerwill.skygrid.worldgen.SkyGridPreset;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.util.Base64;
 import java.util.Map;
@@ -154,8 +156,11 @@ public class SkyGridPresetsScreen extends Screen {
 
         public void refreshEntries() {
             this.clearEntries();
-            for (SkyGridPreset preset : SkyGrid.getAllPresets()) {
+            for (SkyGridPreset preset : SkyGrid.PRESETS) {
                 this.addEntry(new SkyGridPresetEntry(preset));
+            }
+            for (SkyGridPreset preset : SkyGrid.CUSTOM_PRESETS) {
+                this.addEntry(new SkyGridCustomPresetEntry(preset));
             }
         }
 
@@ -186,7 +191,48 @@ public class SkyGridPresetsScreen extends Screen {
                 context.drawText(SkyGridPresetsScreen.this.textRenderer, Text.translatable(preset.name()), x + 18 + 5, y + 3, 16777215, false);
             }
         }
+
+        @Environment(EnvType.CLIENT)
+        public class SkyGridCustomPresetEntry extends SkyGridPresetEntry {
+            private final ButtonWidget deleteButton;
+
+            public SkyGridCustomPresetEntry(SkyGridPreset preset) {
+                super(preset);
+                this.deleteButton = ButtonWidget.builder(Text.translatable("createWorld.skygrid.customize.presets.delete"), button -> {
+                    try {
+                        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                        byte[] hash = digest.digest(preset.name().getBytes(StandardCharsets.UTF_8));
+                        String hashedName = Base64.getEncoder().encodeToString(hash);
+                        String fileName = FabricLoader.getInstance().getConfigDir().toString() + "/" + SkyGrid.MOD_ID + "/" + hashedName + ".json";
+                        File file = new File(fileName);
+                        Files.deleteIfExists(file.toPath());
+                        SkyGrid.reloadCustomPresets();
+                        SkyGridPresetListWidget.this.removeEntry(this);
+                    } catch (Exception e) {
+                        SkyGrid.LOGGER.error("Failed to delete preset {}: {}", preset, e);
+                    }
+                }).width(50).build();
+            }
+
+            @Override
+            public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+                super.render(context, index, y, x, entryWidth, entryHeight, mouseX, mouseY, hovered, tickDelta);
+                this.deleteButton.setX(x + entryWidth - this.deleteButton.getWidth() - 5);
+                this.deleteButton.setY(y);
+                this.deleteButton.render(context, mouseX, mouseY, tickDelta);
+            }
+
+            // Allowing slider to be draggable
+            @Override
+            public boolean mouseClicked(double mouseX, double mouseY, int button) {
+                if (this.deleteButton.isMouseOver(mouseX, mouseY)) {
+                    return this.deleteButton.mouseClicked(mouseX, mouseY, button);
+                }
+                return super.mouseClicked(mouseX, mouseY, button);
+            }
+        }
     }
+
 
     @Environment(EnvType.CLIENT)
     protected class PresetsTextField extends TextField {

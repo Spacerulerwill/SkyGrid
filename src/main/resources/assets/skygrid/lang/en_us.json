@@ -16,6 +16,7 @@
   "createWorld.customize.skygrid.add": "Add",
   "createWorld.skygrid.customize.presets.select": "Select Preset",
   "createWorld.skygrid.customize.presets.save": "Save Preset",
+  "createWorld.skygrid.customize.presets.delete": "Delete",
   "minecraft.overworld": "The Overworld",
   "minecraft.the_nether": "The Nether",
   "minecraft.the_end": "The End"
