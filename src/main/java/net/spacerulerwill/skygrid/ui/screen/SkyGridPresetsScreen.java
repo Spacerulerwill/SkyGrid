@@ -17,7 +17,6 @@ import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
 import net.minecraft.client.gui.widget.ThreePartsLayoutWidget;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.item.Item;
-import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -32,8 +31,10 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.MessageDigest;
+import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Map;
+import java.util.List;
+import java.util.Random;
 
 @Environment(EnvType.CLIENT)
 public class SkyGridPresetsScreen extends Screen {
@@ -107,28 +108,24 @@ public class SkyGridPresetsScreen extends Screen {
             String hashedName = Base64.getEncoder().encodeToString(hash);
             // Get the preset
             SkyGridConfig currentConfig = this.parent.getCurrentSkyGridConfig();
-            // Icon will be most common block
+            // Icon will be the most common block
             int maxWeight = 0;
-            Item icon = Items.BEDROCK;
             // Should be better
-            for (Map.Entry<Block, Integer> entry : currentConfig.overworldConfig().blocks().entrySet()) {
-                if (entry.getValue() > maxWeight) {
-                    icon = entry.getKey().asItem();
-                    maxWeight = entry.getValue();
-                }
-            }
-            for (Map.Entry<Block, Integer> entry : currentConfig.netherConfig().blocks().entrySet()) {
-                if (entry.getValue() > maxWeight) {
-                    icon = entry.getKey().asItem();
-                    maxWeight = entry.getValue();
-                }
-            }
-            for (Map.Entry<Block, Integer> entry : currentConfig.endConfig().blocks().entrySet()) {
-                if (entry.getValue() > maxWeight) {
-                    icon = entry.getKey().asItem();
-                    maxWeight = entry.getValue();
-                }
-            }
+            List<Item> allItems = new ArrayList<>();
+            currentConfig.overworldConfig().blocks().keySet().stream()
+                    .map(Block::asItem)
+                    .forEach(allItems::add);
+            allItems.addAll(currentConfig.overworldConfig().chestItems().keySet());
+            currentConfig.netherConfig().blocks().keySet().stream()
+                    .map(Block::asItem)
+                    .forEach(allItems::add);
+            allItems.addAll(currentConfig.overworldConfig().chestItems().keySet());
+            currentConfig.endConfig().blocks().keySet().stream()
+                    .map(Block::asItem)
+                    .forEach(allItems::add);
+            allItems.addAll(currentConfig.overworldConfig().chestItems().keySet());
+            Random random = new Random();
+            Item icon = allItems.get(random.nextInt(allItems.size()));
             SkyGridPreset preset = new SkyGridPreset(icon, name, currentConfig);
             // Encode it as json
             JsonElement element = new JsonObject();
