@@ -12,13 +12,14 @@ public abstract class WeightSliderListWidgetEntry<T extends AlwaysSelectedEntryL
     public WeightSliderListWidgetEntry(Text text, double min, double max, double initial) {
         this.weightSlider = new WeightSlider(0, 0, 193, 20, text, min, max, initial) {
             @Override
-            protected void applyWeight(int weight) {
+            protected void applyWeight(double weight) {
                 WeightSliderListWidgetEntry.this.applyWeight(weight);
             }
         };
     }
 
-    public abstract void applyWeight(int weight);
+    public abstract void applyWeight(double weight);
+
     public abstract Item getIcon();
 
     @Override

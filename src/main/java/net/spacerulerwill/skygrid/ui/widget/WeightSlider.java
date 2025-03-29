@@ -22,14 +22,15 @@ public abstract class WeightSlider extends SliderWidget {
     }
 
     private MutableText createMessage() {
-        int weight = getWeight();
+        double weight = getWeight();
+        String formattedValue = String.format("%.2f", weight);
         return this.text.copy()
                 .append(Text.literal(": "))
-                .append(Text.literal(String.valueOf(weight)));
+                .append(Text.literal(formattedValue));
     }
 
-    private int getWeight() {
-        return (int) (this.value * (this.maxValue - this.minValue) + this.minValue);
+    private double getWeight() {
+        return this.value * (this.maxValue - this.minValue) + this.minValue;
     }
 
     @Override
@@ -37,7 +38,7 @@ public abstract class WeightSlider extends SliderWidget {
         this.setMessage(this.createMessage());
     }
 
-    protected abstract void applyWeight(int weight);
+    protected abstract void applyWeight(double weight);
 
     @Override
     protected void applyValue() {

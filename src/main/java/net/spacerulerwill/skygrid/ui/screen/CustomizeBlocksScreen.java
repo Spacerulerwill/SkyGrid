@@ -20,9 +20,9 @@ import java.util.Map;
 import java.util.Optional;
 
 public class CustomizeBlocksScreen extends DimensionSpecificCustomizableListWidgetScreen<CustomizeBlocksScreen.BlockWeightListEntry, Block> {
-    private static final int INITIAL_BLOCK_WEIGHT = 160;
-    private static final int MIN_BLOCK_WEIGHT = 0;
-    private static final int MAX_BLOCK_WEIGHT = 500;
+    private static final double INITIAL_BLOCK_WEIGHT = 160;
+    private static final double MIN_BLOCK_WEIGHT = 0;
+    private static final double MAX_BLOCK_WEIGHT = 500;
 
     public CustomizeBlocksScreen(CustomizeSkyGridScreen parent, SkyGridConfig currentConfig) {
         super(parent, currentConfig, Text.translatable("createWorld.customize.skygrid.blocks"), Text.translatable("createWorld.customize.skygrid.blocks.placeholder"), 25);
@@ -40,7 +40,7 @@ public class CustomizeBlocksScreen extends DimensionSpecificCustomizableListWidg
 
     @Override
     public void onClear() {
-        Map<Block, Integer> blocks = this.getCurrentBlocks();
+        Map<Block, Double> blocks = this.getCurrentBlocks();
         blocks.clear();
     }
 
@@ -71,7 +71,7 @@ public class CustomizeBlocksScreen extends DimensionSpecificCustomizableListWidg
 
     @Override
     protected void onAdd(Block block) {
-        Map<Block, Integer> blocks = this.getCurrentBlocks();
+        Map<Block, Double> blocks = this.getCurrentBlocks();
         if (blocks.containsKey(block)) {
             throw new IllegalStateException("Add button called while item to add is already present");
         }
@@ -86,12 +86,12 @@ public class CustomizeBlocksScreen extends DimensionSpecificCustomizableListWidg
 
     @Override
     protected void onDelete(BlockWeightListEntry entry) {
-        Map<Block, Integer> blocks = getCurrentBlocks();
+        Map<Block, Double> blocks = getCurrentBlocks();
         blocks.remove(entry.block);
     }
 
-    private Map<Block, Integer> getCurrentBlocks() {
-        Map<Block, Integer> blocks;
+    private Map<Block, Double> getCurrentBlocks() {
+        Map<Block, Double> blocks;
         if (this.currentDimension == DimensionOptions.OVERWORLD) {
             blocks = this.currentConfig.overworldConfig().blocks();
         } else if (this.currentDimension == DimensionOptions.NETHER) {
@@ -107,8 +107,8 @@ public class CustomizeBlocksScreen extends DimensionSpecificCustomizableListWidg
     @Override
     protected List<BlockWeightListEntry> getEntriesFromConfig() {
         List<BlockWeightListEntry> entries = new ArrayList<>();
-        Map<Block, Integer> blocks = this.getCurrentBlocks();
-        for (Map.Entry<Block, Integer> entry : blocks.entrySet()) {
+        Map<Block, Double> blocks = this.getCurrentBlocks();
+        for (Map.Entry<Block, Double> entry : blocks.entrySet()) {
             Block block = entry.getKey();
             double weight = entry.getValue();
             entries.add(new BlockWeightListEntry(block, weight));
@@ -131,8 +131,8 @@ public class CustomizeBlocksScreen extends DimensionSpecificCustomizableListWidg
         }
 
         @Override
-        public void applyWeight(int weight) {
-            Map<Block, Integer> blocks = CustomizeBlocksScreen.this.getCurrentBlocks();
+        public void applyWeight(double weight) {
+            Map<Block, Double> blocks = CustomizeBlocksScreen.this.getCurrentBlocks();
             blocks.put(this.block, weight);
         }
 

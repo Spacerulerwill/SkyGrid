@@ -6,18 +6,17 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
-import net.minecraft.util.dynamic.Codecs;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
-public record SkyGridChunkGeneratorConfig(LinkedHashMap<Block, Integer> blocks,
+public record SkyGridChunkGeneratorConfig(LinkedHashMap<Block, Double> blocks,
                                           LinkedHashSet<EntityType<?>> spawnerEntities,
-                                          LinkedHashMap<Item, Integer> chestItems) {
-    static Codec<LinkedHashMap<Block, Integer>> BLOCK_WEIGHT_MAP_CODEC = Codec.unboundedMap(Registries.BLOCK.getCodec(), Codecs.POSITIVE_INT)
+                                          LinkedHashMap<Item, Double> chestItems) {
+    static Codec<LinkedHashMap<Block, Double>> BLOCK_WEIGHT_MAP_CODEC = Codec.unboundedMap(Registries.BLOCK.getCodec(), Codec.DOUBLE)
             .xmap(LinkedHashMap::new, map -> map);
-    static Codec<LinkedHashMap<Item, Integer>> ITEM_WEIGHT_MAP_CODEC = Codec.unboundedMap(Registries.ITEM.getCodec(), Codecs.POSITIVE_INT)
+    static Codec<LinkedHashMap<Item, Double>> ITEM_WEIGHT_MAP_CODEC = Codec.unboundedMap(Registries.ITEM.getCodec(), Codec.DOUBLE)
             .xmap(LinkedHashMap::new, map -> map);
     public static final Codec<SkyGridChunkGeneratorConfig> CODEC = RecordCodecBuilder.create(
             instance -> instance.group(

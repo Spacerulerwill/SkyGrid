@@ -58,19 +58,19 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
         this.entities = config.spawnerEntities().stream().toList();
     }
 
-    private <T> DiscreteProbabilityCollectionSampler<T> createWeightedProbabilityTable(Map<T, Integer> blockWeights) {
+    private <T> DiscreteProbabilityCollectionSampler<T> createWeightedProbabilityTable(Map<T, Double> blockWeights) {
         // Calculate the total weight
         int totalWeight = 0;
-        for (Integer value : blockWeights.values()) {
+        for (Double value : blockWeights.values()) {
             totalWeight += value;
         }
 
         // Normalize each block's weight
         Map<T, Double> normalizedWeights = new LinkedHashMap<>();
-        for (Map.Entry<T, Integer> entry : blockWeights.entrySet()) {
+        for (Map.Entry<T, Double> entry : blockWeights.entrySet()) {
             T t = entry.getKey();
-            Integer weight = entry.getValue();
-            Double normalizedWeight = weight.doubleValue() / totalWeight;
+            Double weight = entry.getValue();
+            Double normalizedWeight = weight / totalWeight;
             normalizedWeights.put(t, normalizedWeight);
         }
 

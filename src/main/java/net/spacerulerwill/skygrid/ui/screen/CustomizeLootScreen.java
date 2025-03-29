@@ -18,9 +18,9 @@ import java.util.Map;
 import java.util.Optional;
 
 public class CustomizeLootScreen extends DimensionSpecificCustomizableListWidgetScreen<CustomizeLootScreen.ItemWeightListEntry, Item> {
-    private static final int INITIAL_ITEM_WEIGHT = 1;
-    private static final int MIN_ITEM_WEIGHT = 0;
-    private static final int MAX_ITEM_WEIGHT = 100;
+    private static final double INITIAL_ITEM_WEIGHT = 1;
+    private static final double MIN_ITEM_WEIGHT = 0;
+    private static final double MAX_ITEM_WEIGHT = 100;
 
     public CustomizeLootScreen(CustomizeSkyGridScreen parent, SkyGridConfig currentConfig) {
         super(parent, currentConfig, Text.translatable("createWorld.customize.skygrid.loot"), Text.translatable("createWorld.customize.loot.placeholder"), 25);
@@ -28,7 +28,7 @@ public class CustomizeLootScreen extends DimensionSpecificCustomizableListWidget
 
     @Override
     public void onClear() {
-        Map<Item, Integer> blocks = this.getChestItems();
+        Map<Item, Double> blocks = this.getChestItems();
         blocks.clear();
     }
 
@@ -61,7 +61,7 @@ public class CustomizeLootScreen extends DimensionSpecificCustomizableListWidget
 
     @Override
     protected void onAdd(Item item) {
-        Map<Item, Integer> chestItems = this.getChestItems();
+        Map<Item, Double> chestItems = this.getChestItems();
         if (chestItems.containsKey(item)) {
             throw new IllegalStateException("Add button called while item to add is already present");
         }
@@ -76,12 +76,12 @@ public class CustomizeLootScreen extends DimensionSpecificCustomizableListWidget
 
     @Override
     protected void onDelete(ItemWeightListEntry entry) {
-        Map<Item, Integer> chestItems = getChestItems();
+        Map<Item, Double> chestItems = getChestItems();
         chestItems.remove(entry.item);
     }
 
-    private Map<Item, Integer> getChestItems() {
-        Map<Item, Integer> items;
+    private Map<Item, Double> getChestItems() {
+        Map<Item, Double> items;
         if (this.currentDimension == DimensionOptions.OVERWORLD) {
             items = this.currentConfig.overworldConfig().chestItems();
         } else if (this.currentDimension == DimensionOptions.NETHER) {
@@ -97,8 +97,8 @@ public class CustomizeLootScreen extends DimensionSpecificCustomizableListWidget
     @Override
     protected List<ItemWeightListEntry> getEntriesFromConfig() {
         List<ItemWeightListEntry> entries = new ArrayList<>();
-        Map<Item, Integer> chestItems = this.getChestItems();
-        for (Map.Entry<Item, Integer> entry : chestItems.entrySet()) {
+        Map<Item, Double> chestItems = this.getChestItems();
+        for (Map.Entry<Item, Double> entry : chestItems.entrySet()) {
             Item item = entry.getKey();
             double weight = entry.getValue();
             entries.add(new ItemWeightListEntry(item, weight));
@@ -121,8 +121,8 @@ public class CustomizeLootScreen extends DimensionSpecificCustomizableListWidget
         }
 
         @Override
-        public void applyWeight(int weight) {
-            Map<Item, Integer> items = CustomizeLootScreen.this.getChestItems();
+        public void applyWeight(double weight) {
+            Map<Item, Double> items = CustomizeLootScreen.this.getChestItems();
             items.put(this.item, weight);
         }
 
