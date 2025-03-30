@@ -141,7 +141,7 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
         return -64;
     }
 
-    private void fillChestBlockEntityWithItems(ChestBlockEntity chestBlockEntity, Random random) {
+    private void fillChestBlockEntityWithItems(LootableContainerBlockEntity blockEntity, Random random) {
         if (this.chestItemProbabilities != null) {
             // How many items for chest
             int numItems = random.nextBetween(2, 5);
@@ -157,7 +157,7 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
                 Item item = this.chestItemProbabilities.sample();
                 int slotIdx = slots.get(nextSlotIdx);
                 nextSlotIdx += 1;
-                chestBlockEntity.setStack(slotIdx, item.getDefaultStack());
+                blockEntity.setStack(slotIdx, item.getDefaultStack());
             }
         }
     }
@@ -185,14 +185,18 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
                         mobSpawnerBlockEntity.setEntityType(this.entities.get(random.nextInt(config.spawnerEntities().size())), random);
                         chunk.setBlockEntity(mobSpawnerBlockEntity);
                     } else if (block.equals(Blocks.CHEST)) {
-                        ChestBlockEntity chestBlockEntity = new ChestBlockEntity(new BlockPos(worldX, y, worldZ), block.getDefaultState());
+                        LootableContainerBlockEntity chestBlockEntity = new ChestBlockEntity(new BlockPos(worldX, y, worldZ), block.getDefaultState());
                         chunk.setBlockEntity(chestBlockEntity);
                         fillChestBlockEntityWithItems(chestBlockEntity, random);
+                    } else if (block.equals(Blocks.BARREL)) {
+                        LootableContainerBlockEntity barrelBlockEntity = new BarrelBlockEntity(new BlockPos(worldX, y, worldZ), block.getDefaultState());
+                        chunk.setBlockEntity(barrelBlockEntity);
+                        fillChestBlockEntityWithItems(barrelBlockEntity, random);
                     } else if (block.equals(Blocks.ENDER_CHEST)) {
                         EnderChestBlockEntity enderChestBlockEntity = new EnderChestBlockEntity(new BlockPos(worldX, y, worldZ), block.getDefaultState());
                         chunk.setBlockEntity(enderChestBlockEntity);
                     } else if (block.equals(Blocks.TRAPPED_CHEST)) {
-                        TrappedChestBlockEntity trappedChestBlockEntity = new TrappedChestBlockEntity(new BlockPos(worldX, y, worldZ), block.getDefaultState());
+                        LootableContainerBlockEntity trappedChestBlockEntity = new TrappedChestBlockEntity(new BlockPos(worldX, y, worldZ), block.getDefaultState());
                         chunk.setBlockEntity(trappedChestBlockEntity);
                         fillChestBlockEntityWithItems(trappedChestBlockEntity, random);
                     } else if (block.equals(Blocks.ENCHANTING_TABLE)) {
