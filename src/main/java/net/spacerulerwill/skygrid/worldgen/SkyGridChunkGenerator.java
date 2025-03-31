@@ -6,8 +6,16 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.*;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.PotionContentsComponent;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EntityType;
-import net.minecraft.item.Item;
+import net.minecraft.item.*;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -39,6 +47,7 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
             ).apply(instance, SkyGridChunkGenerator::new)
     );
 
+    public static final int MAX_BOOK_ENCHANTS = 5;
 
     private final SkyGridChunkGeneratorConfig config;
     private final List<EntityType<?>> entities;
@@ -56,9 +65,10 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
             this.chestItemProbabilities = createWeightedProbabilityTable(config.chestItems());
         }
         this.entities = config.spawnerEntities().stream().toList();
+
     }
 
-    private <T> DiscreteProbabilityCollectionSampler<T> createWeightedProbabilityTable(Map<T, Double> blockWeights) {
+    private static <T> DiscreteProbabilityCollectionSampler<T> createWeightedProbabilityTable(Map<T, Double> blockWeights) {
         // Calculate the total weight
         int totalWeight = 0;
         for (Double value : blockWeights.values()) {
@@ -78,8 +88,14 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
         return new DiscreteProbabilityCollectionSampler<T>(new MinecraftRandomAdapter(), normalizedWeights);
     }
 
-    private Random getRandomForChunk(NoiseConfig noiseConfig, int x, int z) {
+    private static Random getRandomForChunk(NoiseConfig noiseConfig, int x, int z) {
         return noiseConfig.getOreRandomDeriver().split((1610612741L * (long) x + 805306457L * (long) z + 402653189L) ^ 201326611L);
+    }
+
+    private static void addRandomEnchantmentToItemStack(ItemStack itemStack, Random random, Registry<Enchantment> enchantmentRegistry) {
+        RegistryEntry<Enchantment> enchantmentRegistryEntry = enchantmentRegistry.getRandom(random).get();
+        int level = random.nextBetween(1, enchantmentRegistryEntry.value().getMaxLevel());
+        itemStack.addEnchantment(enchantmentRegistryEntry, level);
     }
 
     @Override
@@ -141,7 +157,7 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
         return -64;
     }
 
-    private void fillChestBlockEntityWithItems(LootableContainerBlockEntity blockEntity, Random random) {
+    private void fillChestBlockEntityWithItems(LootableContainerBlockEntity blockEntity, Random random, DynamicRegistryManager dynamicRegistryManager) {
         if (this.chestItemProbabilities != null) {
             // How many items for chest
             int numItems = random.nextBetween(2, 5);
@@ -155,9 +171,26 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
             int nextSlotIdx = 0;
             for (int i = 0; i < numItems; i++) {
                 Item item = this.chestItemProbabilities.sample();
+                ItemStack itemStack = item.getDefaultStack();
+                if (item instanceof PotionItem || item.equals(Items.TIPPED_ARROW) || item.equals(Items.SUSPICIOUS_STEW)) {
+                    itemStack.set(DataComponentTypes.POTION_CONTENTS, new PotionContentsComponent(Registries.POTION.getRandom(random).get()));
+                } else if (item.equals(Items.GOAT_HORN)) {
+                    Registry<Instrument> instrumentRegistry = dynamicRegistryManager.getOrThrow(RegistryKeys.INSTRUMENT);
+                    itemStack.set(DataComponentTypes.INSTRUMENT, instrumentRegistry.getRandom(random).get());
+                } else if (item.equals(Items.ENCHANTED_BOOK)) {
+                    // always have 1 enchantment at least
+                    Registry<Enchantment> enchantmentRegistry = dynamicRegistryManager.getOrThrow(RegistryKeys.ENCHANTMENT);
+                    float chance = 1.0f;
+                    for (int j = 0; j < MAX_BOOK_ENCHANTS; j++) {
+                        if (random.nextFloat() < chance) {
+                            addRandomEnchantmentToItemStack(itemStack, random, enchantmentRegistry);
+                        }
+                        chance *= 0.66f;
+                    }
+                }
                 int slotIdx = slots.get(nextSlotIdx);
                 nextSlotIdx += 1;
-                blockEntity.setStack(slotIdx, item.getDefaultStack());
+                blockEntity.setStack(slotIdx, itemStack);
             }
         }
     }
@@ -165,7 +198,8 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
     // Doing it all here is good enough for now
     @Override
     public CompletableFuture<Chunk> populateNoise(Blender blender, NoiseConfig noiseConfig, StructureAccessor structureAccessor, Chunk chunk) {
-        Random random = this.getRandomForChunk(noiseConfig, chunk.getPos().x, chunk.getPos().z);
+        DynamicRegistryManager dynamicRegistryManager = structureAccessor.getRegistryManager();
+        Random random = getRandomForChunk(noiseConfig, chunk.getPos().x, chunk.getPos().z);
         UniformRandomProvider uniformRandomProvider = new MinecraftRandomAdapter(random);
         this.blockProbabilities = this.blockProbabilities.withUniformRandomProvider(uniformRandomProvider);
         if (this.chestItemProbabilities != null) {
@@ -187,21 +221,24 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
                     } else if (block.equals(Blocks.CHEST)) {
                         LootableContainerBlockEntity chestBlockEntity = new ChestBlockEntity(new BlockPos(worldX, y, worldZ), block.getDefaultState());
                         chunk.setBlockEntity(chestBlockEntity);
-                        fillChestBlockEntityWithItems(chestBlockEntity, random);
+                        fillChestBlockEntityWithItems(chestBlockEntity, random, dynamicRegistryManager);
                     } else if (block.equals(Blocks.BARREL)) {
                         LootableContainerBlockEntity barrelBlockEntity = new BarrelBlockEntity(new BlockPos(worldX, y, worldZ), block.getDefaultState());
                         chunk.setBlockEntity(barrelBlockEntity);
-                        fillChestBlockEntityWithItems(barrelBlockEntity, random);
+                        fillChestBlockEntityWithItems(barrelBlockEntity, random, dynamicRegistryManager);
                     } else if (block.equals(Blocks.ENDER_CHEST)) {
                         EnderChestBlockEntity enderChestBlockEntity = new EnderChestBlockEntity(new BlockPos(worldX, y, worldZ), block.getDefaultState());
                         chunk.setBlockEntity(enderChestBlockEntity);
                     } else if (block.equals(Blocks.TRAPPED_CHEST)) {
                         LootableContainerBlockEntity trappedChestBlockEntity = new TrappedChestBlockEntity(new BlockPos(worldX, y, worldZ), block.getDefaultState());
                         chunk.setBlockEntity(trappedChestBlockEntity);
-                        fillChestBlockEntityWithItems(trappedChestBlockEntity, random);
+                        fillChestBlockEntityWithItems(trappedChestBlockEntity, random, dynamicRegistryManager);
                     } else if (block.equals(Blocks.ENCHANTING_TABLE)) {
                         EnchantingTableBlockEntity enchantingTableBlockEntity = new EnchantingTableBlockEntity(new BlockPos(worldX, y, worldZ), block.getDefaultState());
                         chunk.setBlockEntity(enchantingTableBlockEntity);
+                    } else if (block.equals(Blocks.DECORATED_POT)) {
+                        DecoratedPotBlockEntity blockEntity = new DecoratedPotBlockEntity(new BlockPos(worldX, y, worldZ), block.getDefaultState());
+                        chunk.setBlockEntity(blockEntity);
                     }
                 }
             }
@@ -234,7 +271,7 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
     // Get one column of the terrain
     @Override
     public VerticalBlockSample getColumnSample(int x, int z, HeightLimitView world, NoiseConfig noiseConfig) {
-        Random random = this.getRandomForChunk(noiseConfig, x >> 4, z >> 4);
+        Random random = getRandomForChunk(noiseConfig, x >> 4, z >> 4);
         blockProbabilities = blockProbabilities.withUniformRandomProvider(new MinecraftRandomAdapter(random));
         BlockState[] states = new BlockState[getWorldHeight() / 4];
         for (int y = getMinimumY(); y < getMinimumY() + getWorldHeight(); y += 4) {
