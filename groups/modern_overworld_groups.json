@@ -1,0 +1,359 @@
+[
+  {
+    "total": 100,
+    "items": [
+      "minecraft:stone",
+      "minecraft:cobblestone",
+      "minecraft:mossy_cobblestone",
+      "minecraft:andesite",
+      "minecraft:granite",
+      "minecraft:diorite",
+      "minecraft:deepslate",
+      "minecraft:tuff",
+      "minecraft:calcite"
+    ]
+  },
+  {
+    "total": 0.5,
+    "items": [
+      "minecraft:infested_stone",
+      "minecraft:infested_deepslate",
+      "minecraft:infested_cobblestone"
+    ]
+  },
+  {
+    "total": 140,
+    "items": [
+      "minecraft:grass_block",
+      "minecraft:dirt",
+      "minecraft:podzol",
+      "minecraft:dirt_path",
+      "minecraft:coarse_dirt",
+      "minecraft:rooted_dirt",
+      "minecraft:farmland",
+      "minecraft:mycelium"
+    ]
+  },
+  {
+    "total": 10,
+    "items": [
+      "minecraft:water"
+    ]
+  },
+  {
+    "total": 5,
+    "items": [
+      "minecraft:lava"
+    ]
+  },
+  {
+    "total": 20,
+    "items": [
+      "minecraft:sand",
+      "minecraft:red_sand"
+    ]
+  },
+  {
+    "total": 10,
+    "items": [
+      "minecraft:gravel",
+      "minecraft:moss_block",
+      "minecraft:pale_moss_block"
+    ]
+  },
+  {
+    "total": 40,
+    "items": [
+      "minecraft:coal_ore",
+      "minecraft:deepslate_coal_ore"
+    ]
+  },
+  {
+    "total": 5,
+    "items": [
+      "minecraft:lapis_ore",
+      "minecraft:deepslate_lapis_ore"
+    ]
+  },
+  {
+    "total": 40,
+    "items": [
+      "minecraft:copper_ore",
+      "minecraft:deepslate_copper_ore"
+    ]
+  },
+  {
+    "total": 20,
+    "items": [
+      "minecraft:iron_ore",
+      "minecraft:deepslate_iron_ore"
+    ]
+  },
+  {
+    "total": 10,
+    "items": [
+      "minecraft:gold_ore",
+      "minecraft:deepslate_gold_ore"
+    ]
+  },
+  {
+    "total": 9,
+    "items": [
+      "minecraft:redstone_ore",
+      "minecraft:deepslate_redstone_ore"
+    ]
+  },
+  {
+    "total": 1,
+    "items": [
+      "minecraft:diamond_ore",
+      "minecraft:deepslate_diamond_ore"
+    ]
+  },
+  {
+    "total": 1,
+    "items": [
+      "minecraft:emerald_ore",
+      "minecraft:deepslate_emerald_ore"
+    ]
+  },
+  {
+    "total": 100,
+    "items": [
+      "minecraft:oak_log",
+      "minecraft:spruce_log",
+      "minecraft:birch_log",
+      "minecraft:acacia_log",
+      "minecraft:dark_oak_log",
+      "minecraft:jungle_log",
+      "minecraft:cherry_log",
+      "minecraft:mangrove_log",
+      "minecraft:pale_oak_log"
+    ]
+  },
+  {
+    "total": 40,
+    "items": [
+      "minecraft:oak_leaves",
+      "minecraft:spruce_leaves",
+      "minecraft:birch_leaves",
+      "minecraft:acacia_leaves",
+      "minecraft:dark_oak_leaves",
+      "minecraft:jungle_leaves",
+      "minecraft:cherry_leaves",
+      "minecraft:mangrove_leaves",
+      "minecraft:pale_oak_leaves"
+    ]
+  },
+  {
+    "total": 1,
+    "items": [
+      "minecraft:glass",
+      "minecraft:white_stained_glass",
+      "minecraft:orange_stained_glass",
+      "minecraft:magenta_stained_glass",
+      "minecraft:light_blue_stained_glass",
+      "minecraft:yellow_stained_glass",
+      "minecraft:lime_stained_glass",
+      "minecraft:pink_stained_glass",
+      "minecraft:gray_stained_glass",
+      "minecraft:light_gray_stained_glass",
+      "minecraft:cyan_stained_glass",
+      "minecraft:purple_stained_glass",
+      "minecraft:blue_stained_glass",
+      "minecraft:brown_stained_glass",
+      "minecraft:green_stained_glass",
+      "minecraft:red_stained_glass",
+      "minecraft:black_stained_glass"
+    ]
+  },
+  {
+    "total": 10,
+    "items": [
+      "minecraft:sandstone",
+      "minecraft:chiseled_sandstone",
+      "minecraft:cut_sandstone",
+      "minecraft:smooth_sandstone",
+      "minecraft:red_sandstone",
+      "minecraft:chiseled_red_sandstone",
+      "minecraft:cut_red_sandstone",
+      "minecraft:smooth_red_sandstone"
+    ]
+  },
+  {
+    "total": 1,
+    "items": [
+      "minecraft:piston",
+      "minecraft:sticky_piston"
+    ]
+  },
+  {
+    "total": 10,
+    "items": [
+      "minecraft:cobweb"
+    ]
+  },
+  {
+    "total": 3,
+    "items": [
+      "minecraft:dead_bush",
+      "minecraft:sweet_berry_bush"
+    ]
+  },
+  {
+    "total": 25,
+    "items": [
+      "minecraft:white_wool",
+      "minecraft:orange_wool",
+      "minecraft:magenta_wool",
+      "minecraft:light_blue_wool",
+      "minecraft:yellow_wool",
+      "minecraft:lime_wool",
+      "minecraft:pink_wool",
+      "minecraft:gray_wool",
+      "minecraft:light_gray_wool",
+      "minecraft:cyan_wool",
+      "minecraft:purple_wool",
+      "minecraft:blue_wool",
+      "minecraft:brown_wool",
+      "minecraft:green_wool",
+      "minecraft:red_wool",
+      "minecraft:black_wool"
+    ]
+  },
+  {
+    "total": 4,
+    "items": [
+      "minecraft:dandelion",
+      "minecraft:poppy",
+      "minecraft:blue_orchid",
+      "minecraft:allium",
+      "minecraft:azure_bluet",
+      "minecraft:red_tulip",
+      "minecraft:orange_tulip",
+      "minecraft:white_tulip",
+      "minecraft:pink_tulip",
+      "minecraft:oxeye_daisy",
+      "minecraft:cornflower",
+      "minecraft:lily_of_the_valley",
+      "minecraft:torchflower",
+      "minecraft:sunflower",
+      "minecraft:lilac",
+      "minecraft:rose_bush",
+      "minecraft:peony"
+    ]
+  },
+  {
+    "total": 5,
+    "items": [
+      "minecraft:obsidian"
+    ]
+  },
+  {
+    "total": 1,
+    "items": [
+      "minecraft:spawner"
+    ]
+  },
+  {
+    "total": 1,
+    "items": [
+      "minecraft:chest",
+      "minecraft:barrel"
+    ]
+  },
+  {
+    "total": 4,
+    "items": [
+      "minecraft:ice",
+      "minecraft:packed_ice",
+      "minecraft:blue_ice"
+    ]
+  },
+  {
+    "total": 8,
+    "items": [
+      "minecraft:snow_block",
+      "minecraft:powder_snow"
+    ]
+  },
+  {
+    "total": 20,
+    "items": [
+      "minecraft:clay"
+    ]
+  },
+  {
+    "total": 10,
+    "items": [
+      "minecraft:brown_mushroom",
+      "minecraft:red_mushroom",
+      "minecraft:brown_mushroom_block",
+      "minecraft:red_mushroom_block",
+      "minecraft:mushroom_stem"
+    ]
+  },
+  {
+    "total": 10,
+    "items": [
+      "minecraft:pumpkin",
+      "minecraft:melon",
+      "minecraft:cactus",
+      "minecraft:amethyst_cluster",
+      "minecraft:sugar_cane"
+    ]
+  },
+  {
+    "total": 5,
+    "items": [
+      "minecraft:prismarine",
+      "minecraft:dark_prismarine",
+      "minecraft:sea_lantern",
+      "minecraft:magma_block"
+    ]
+  },
+  {
+    "total": 5,
+    "items": [
+      "minecraft:slime_block",
+      "minecraft:honey_block",
+      "minecraft:hay_block"
+    ]
+  },
+  {
+    "total": 1,
+    "items": [
+      "minecraft:tnt",
+      "minecraft:bone_block"
+    ]
+  },
+  {
+    "total": 2,
+    "items": [
+      "minecraft:beehive",
+      "minecraft:suspicious_sand",
+      "minecraft:suspicious_gravel",
+      "minecraft:decorated_pot"
+    ]
+  },
+  {
+    "total": 0.2,
+    "items": [
+      "minecraft:amethyst_block"
+    ]
+  },
+  {
+    "total": 1,
+    "items": [
+      "minecraft:sculk",
+      "minecraft:sculk_catalyst"
+    ]
+  },
+  {
+    "total": 0.1,
+    "items": [
+      "minecraft:sculk_sensor",
+      "minecraft:sculk_shrieker"
+    ]
+  }
+]

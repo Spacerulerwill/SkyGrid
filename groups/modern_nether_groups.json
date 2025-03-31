@@ -1,0 +1,111 @@
+[
+  {
+    "total": 50,
+    "items": [
+      "minecraft:lava",
+      "minecraft:magma_block"
+    ]
+  },
+  {
+    "total": 30,
+    "items": [
+      "minecraft:gravel"
+    ]
+  },
+  {
+    "total": 10,
+    "items": [
+      "minecraft:shroomlight"
+    ]
+  },
+  {
+    "total": 2,
+    "items": [
+      "minecraft:spawner"
+    ]
+  },
+  {
+    "total": 300,
+    "items": [
+      "minecraft:netherrack",
+      "minecraft:basalt",
+      "minecraft:blackstone"
+    ]
+  },
+  {
+    "total": 50,
+    "items": [
+      "minecraft:warped_nylium",
+      "minecraft:crimson_nylium"
+    ]
+  },
+  {
+    "total": 50,
+    "items": [
+      "minecraft:crimson_stem",
+      "minecraft:warped_stem"
+    ]
+  },
+  {
+    "total": 100,
+    "items": [
+      "minecraft:soul_sand",
+      "minecraft:soul_soil"
+    ]
+  },
+  {
+    "total": 50,
+    "items": [
+      "minecraft:glowstone"
+    ]
+  },
+  {
+    "total": 1,
+    "items": [
+      "minecraft:ancient_debris"
+    ]
+  },
+  {
+    "total": 30,
+    "items": [
+      "minecraft:nether_bricks",
+      "minecraft:polished_blackstone_bricks"
+    ]
+  },
+  {
+    "total": 10,
+    "items": [
+      "minecraft:nether_brick_fence",
+      "minecraft:blackstone_wall"
+    ]
+  },
+  {
+    "total": 15,
+    "items": [
+      "minecraft:nether_brick_stairs",
+      "minecraft:blackstone_stairs"
+    ]
+  },
+  {
+    "total": 30,
+    "items": [
+      "minecraft:nether_wart",
+      "minecraft:crimson_fungus",
+      "minecraft:warped_fungus"
+    ]
+  },
+  {
+    "total": 5,
+    "items": [
+      "minecraft:crying_obsidian",
+      "minecraft:gilded_blackstone"
+    ]
+  },
+  {
+    "total": 75,
+    "items": [
+      "minecraft:nether_quartz_ore",
+      "minecraft:nether_gold_ore"
+    ]
+  }
+]

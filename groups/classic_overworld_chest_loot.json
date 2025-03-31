@@ -1,0 +1,159 @@
+[
+  {
+    "total": 6,
+    "items": [
+      "minecraft:wooden_sword",
+      "minecraft:wooden_pickaxe",
+      "minecraft:wooden_axe",
+      "minecraft:wooden_shovel",
+      "minecraft:wooden_hoe",
+      "minecraft:stone_sword",
+      "minecraft:stone_pickaxe",
+      "minecraft:stone_axe",
+      "minecraft:stone_shovel",
+      "minecraft:stone_hoe"
+    ]
+  },
+  {
+    "total": 3,
+    "items": [
+      "minecraft:iron_sword",
+      "minecraft:iron_pickaxe",
+      "minecraft:iron_axe",
+      "minecraft:iron_shovel",
+      "minecraft:iron_hoe",
+      "minecraft:golden_sword",
+      "minecraft:golden_pickaxe",
+      "minecraft:golden_axe",
+      "minecraft:golden_hoe"
+    ]
+  },
+  {
+    "total": 1,
+    "items": [
+      "minecraft:diamond_sword",
+      "minecraft:diamond_pickaxe",
+      "minecraft:diamond_axe",
+      "minecraft:diamond_shovel",
+      "minecraft:diamond_hoe"
+    ]
+  },
+  {
+    "total": 6,
+    "items": [
+      "minecraft:leather_helmet",
+      "minecraft:leather_chestplate",
+      "minecraft:leather_leggings",
+      "minecraft:leather_boots",
+      "minecraft:chainmail_helmet",
+      "minecraft:chainmail_chestplate",
+      "minecraft:chainmail_leggings",
+      "minecraft:chainmail_boots"
+    ]
+  },
+  {
+    "total": 3,
+    "items": [
+      "minecraft:iron_helmet",
+      "minecraft:iron_chestplate",
+      "minecraft:iron_leggings",
+      "minecraft:iron_boots",
+      "minecraft:golden_helmet",
+      "minecraft:golden_chestplate",
+      "minecraft:golden_leggings",
+      "minecraft:golden_boots"
+    ]
+  },
+  {
+    "total": 1,
+    "items": [
+      "minecraft:diamond_helmet",
+      "minecraft:diamond_chestplate",
+      "minecraft:diamond_leggings",
+      "minecraft:diamond_boots"
+    ]
+  },
+  {
+    "total": 45,
+    "items": [
+      "minecraft:iron_ingot",
+      "minecraft:gold_ingot",
+      "minecraft:diamond",
+      "minecraft:flint",
+      "minecraft:painting",
+      "minecraft:oak_sign",
+      "minecraft:oak_door",
+      "minecraft:bucket",
+      "minecraft:water_bucket",
+      "minecraft:lava_bucket",
+      "minecraft:minecart",
+      "minecraft:saddle",
+      "minecraft:iron_door",
+      "minecraft:redstone",
+      "minecraft:milk_bucket",
+      "minecraft:paper",
+      "minecraft:leather",
+      "minecraft:brick",
+      "minecraft:snowball",
+      "minecraft:oak_boat",
+      "minecraft:clay",
+      "minecraft:book",
+      "minecraft:slime_ball",
+      "minecraft:chest_minecart",
+      "minecraft:compass",
+      "minecraft:fishing_rod",
+      "minecraft:furnace_minecart",
+      "minecraft:clock",
+      "minecraft:glowstone_dust",
+      "minecraft:diamond",
+      "minecraft:flint_and_steel",
+      "minecraft:bow",
+      "minecraft:bowl",
+      "minecraft:arrow",
+      "minecraft:string",
+      "minecraft:feather",
+      "minecraft:stick",
+      "minecraft:gunpowder",
+      "minecraft:coal"
+    ]
+  },
+  {
+    "total": 30,
+    "items": [
+      "minecraft:porkchop",
+      "minecraft:cooked_porkchop",
+      "minecraft:cooked_cod",
+      "minecraft:cod",
+      "minecraft:egg",
+      "minecraft:sugar_cane",
+      "minecraft:apple",
+      "minecraft:mushroom_stew"
+    ]
+  },
+  {
+    "total": 20,
+    "items": [
+      "minecraft:spider_spawn_egg",
+      "minecraft:creeper_spawn_egg",
+      "minecraft:skeleton_spawn_egg",
+      "minecraft:zombified_piglin_spawn_egg",
+      "minecraft:cave_spider_spawn_egg",
+      "minecraft:zombie_spawn_egg",
+      "minecraft:slime_spawn_egg",
+      "minecraft:silverfish_spawn_egg",
+      "minecraft:enderman_spawn_egg",
+      "minecraft:ghast_spawn_egg",
+      "minecraft:blaze_spawn_egg",
+      "minecraft:magma_cube_spawn_egg",
+      "minecraft:chicken_spawn_egg",
+      "minecraft:wolf_spawn_egg",
+      "minecraft:pig_spawn_egg",
+      "minecraft:sheep_spawn_egg",
+      "minecraft:cow_spawn_egg",
+      "minecraft:squid_spawn_egg",
+      "minecraft:mooshroom_spawn_egg",
+      "minecraft:villager_spawn_egg",
+      "minecraft:ocelot_spawn_egg"
+    ]
+  }
+]
