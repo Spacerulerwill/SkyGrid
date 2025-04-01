@@ -82,5 +82,5 @@ publishing {
 }
 
 loom {
-    accessWidenerPath = file("src/main/resources/skygrid.accesswidener")
+    accessWidenerPath = file("src/main/resources/skygrid_reloaded.accesswidener")
 }

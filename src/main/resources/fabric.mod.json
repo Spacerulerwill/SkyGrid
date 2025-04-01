@@ -1,35 +1,35 @@
 {
-	"schemaVersion": 1,
-	"id": "skygrid",
-	"version": "${version}",
-	"name": "SkyGrid",
-	"description": "SkyGrid adds a new world type - an infinite grid of randomly generated blocks",
-	"authors": [
-		"Spacerulerwill"
-	],
-	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
-	},
-	"license": "MIT",
-	"icon": "assets/skygrid/icon.png",
-	"environment": "*",
-	"entrypoints": {
-		"main": [
-			"net.spacerulerwill.skygrid.SkyGrid"
-		]
-	},
-	"mixins": [
-		"skygrid.mixins.json"
-	],
-	"depends": {
-		"fabricloader": ">=0.15.11",
-		"minecraft": "~1.21",
-		"java": ">=21",
-		"fabric-api": "*"
-	},
-	"suggests": {
-		"another-mod": "*"
-	},
-	"accessWidener" : "skygrid.accesswidener"
+  "schemaVersion": 1,
+  "id": "skygrid_reloaded",
+  "version": "${version}",
+  "name": "SkyGrid Reloaded",
+  "description": "SkyGrid Reloaded adds the SkyGrid world type - an infinite grid of randomly sgenerated blocks",
+  "authors": [
+    "Spacerulerwill"
+  ],
+  "contact": {
+    "homepage": "https://fabricmc.net/",
+    "sources": "https://github.com/FabricMC/fabric-example-mod"
+  },
+  "license": "MIT",
+  "icon": "assets/skygrid_reloaded/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "net.spacerulerwill.skygrid_reloaded.SkyGridReloaded"
+    ]
+  },
+  "mixins": [
+    "skygrid_reloaded.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.15.11",
+    "minecraft": "~1.21",
+    "java": ">=21",
+    "fabric-api": "*"
+  },
+  "suggests": {
+    "another-mod": "*"
+  },
+  "accessWidener": "skygrid_reloaded.accesswidener"
 }
