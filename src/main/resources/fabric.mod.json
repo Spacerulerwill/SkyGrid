@@ -3,7 +3,7 @@
   "id": "skygrid_reloaded",
   "version": "${version}",
   "name": "SkyGrid Reloaded",
-  "description": "SkyGrid Reloaded adds the SkyGrid world type - an infinite grid of randomly sgenerated blocks",
+  "description": "SkyGrid Reloaded adds the SkyGrid world type - an infinite grid of randomly generated blocks",
   "authors": [
     "Spacerulerwill"
   ],
