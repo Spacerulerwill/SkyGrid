@@ -132,6 +132,7 @@
         "minecraft:spawner": 1.0,
         "minecraft:chest": 0.5,
         "minecraft:barrel": 0.5,
+        "minecraft:sponge": 1.0,
         "minecraft:ice": 1.3333333333333333,
         "minecraft:packed_ice": 1.3333333333333333,
         "minecraft:blue_ice": 1.3333333333333333,

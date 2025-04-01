@@ -36,7 +36,9 @@ import net.spacerulerwill.skygrid.util.MinecraftRandomAdapter;
 import org.apache.commons.rng.UniformRandomProvider;
 import org.apache.commons.rng.sampling.DiscreteProbabilityCollectionSampler;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class SkyGridChunkGenerator extends ChunkGenerator {
@@ -58,34 +60,15 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
     public SkyGridChunkGenerator(BiomeSource biomeSource, SkyGridChunkGeneratorConfig config) {
         super(biomeSource);
         this.config = config;
-        this.blockProbabilities = createWeightedProbabilityTable(config.blocks());
+        this.blockProbabilities = new DiscreteProbabilityCollectionSampler<>(new MinecraftRandomAdapter(), config.blocks());
+
         if (config.chestItems().isEmpty()) {
             this.chestItemProbabilities = null;
         } else {
-            this.chestItemProbabilities = createWeightedProbabilityTable(config.chestItems());
+            this.chestItemProbabilities = new DiscreteProbabilityCollectionSampler<>(new MinecraftRandomAdapter(), config.chestItems());
         }
         this.entities = config.spawnerEntities().stream().toList();
 
-    }
-
-    private static <T> DiscreteProbabilityCollectionSampler<T> createWeightedProbabilityTable(Map<T, Double> blockWeights) {
-        // Calculate the total weight
-        int totalWeight = 0;
-        for (Double value : blockWeights.values()) {
-            totalWeight += value;
-        }
-
-        // Normalize each block's weight
-        Map<T, Double> normalizedWeights = new LinkedHashMap<>();
-        for (Map.Entry<T, Double> entry : blockWeights.entrySet()) {
-            T t = entry.getKey();
-            Double weight = entry.getValue();
-            Double normalizedWeight = weight / totalWeight;
-            normalizedWeights.put(t, normalizedWeight);
-        }
-
-        // Return the DiscreteProbabilityCollectionSampler with normalized weights
-        return new DiscreteProbabilityCollectionSampler<T>(new MinecraftRandomAdapter(), normalizedWeights);
     }
 
     private static Random getRandomForChunk(NoiseConfig noiseConfig, int x, int z) {
