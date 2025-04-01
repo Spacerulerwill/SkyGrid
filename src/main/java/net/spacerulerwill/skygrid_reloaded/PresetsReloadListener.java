@@ -31,7 +31,7 @@ public class PresetsReloadListener implements SimpleSynchronousResourceReloadLis
                 JsonElement json = JsonParser.parseString(new String(stream.readAllBytes(), StandardCharsets.UTF_8));
                 SkyGridPreset preset = SkyGridPreset.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow();
                 SkyGridReloaded.PRESETS.add(preset);
-                if (identifier.equals(Identifier.of(SkyGridReloaded.MOD_ID, "presets/classic.json"))) {
+                if (identifier.equals(Identifier.of(SkyGridReloaded.MOD_ID, "presets/modern.json"))) {
                     SkyGridReloaded.DEFAULT_PRESET = preset;
                 }
                 SkyGridReloaded.LOGGER.info("Loaded preset {}", identifier);

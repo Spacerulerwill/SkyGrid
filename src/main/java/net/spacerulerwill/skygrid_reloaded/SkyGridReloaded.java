@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 
 public class SkyGridReloaded implements ModInitializer {
     public static final String MOD_ID = "skygrid_reloaded";
@@ -47,6 +49,7 @@ public class SkyGridReloaded implements ModInitializer {
         if (directoryListing == null) {
             return;
         }
+        Arrays.sort(directoryListing, Comparator.comparing(File::getName));
 
         // Process each custom preset
         for (File child : directoryListing) {
