@@ -33,7 +33,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.Random;
 
@@ -201,7 +200,7 @@ public class SkyGridPresetsScreen extends Screen {
                     try {
                         MessageDigest digest = MessageDigest.getInstance("SHA-256");
                         byte[] hash = digest.digest(preset.name().getBytes(StandardCharsets.UTF_8));
-                        String hashedName = Base64.getEncoder().encodeToString(hash);
+                        String hashedName = Hex.encodeHexString(hash);
                         String fileName = FabricLoader.getInstance().getConfigDir().toString() + "/" + SkyGridReloaded.MOD_ID + "/" + hashedName + ".json";
                         File file = new File(fileName);
                         Files.deleteIfExists(file.toPath());
