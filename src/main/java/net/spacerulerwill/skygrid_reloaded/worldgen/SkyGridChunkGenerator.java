@@ -5,7 +5,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.BrushableBlock;
 import net.minecraft.block.entity.BarrelBlockEntity;
+import net.minecraft.block.entity.BrushableBlockEntity;
 import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.block.entity.DecoratedPotBlockEntity;
 import net.minecraft.block.entity.EnchantingTableBlockEntity;
@@ -22,9 +24,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.PotionItem;
+import net.minecraft.loot.LootTable;
+import net.minecraft.loot.LootTables;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.state.property.Properties;
@@ -48,6 +53,7 @@ import org.apache.commons.rng.UniformRandomProvider;
 import org.apache.commons.rng.sampling.DiscreteProbabilityCollectionSampler;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -61,6 +67,15 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
     );
 
     public static final int MAX_BOOK_ENCHANTS = 5;
+
+    public static final List<RegistryKey<LootTable>> ARCHEOLOGY_LOOT_TABLES = Arrays.asList(
+            LootTables.DESERT_PYRAMID_ARCHAEOLOGY,
+            LootTables.DESERT_WELL_ARCHAEOLOGY,
+            LootTables.OCEAN_RUIN_COLD_ARCHAEOLOGY,
+            LootTables.OCEAN_RUIN_WARM_ARCHAEOLOGY,
+            LootTables.TRAIL_RUINS_COMMON_ARCHAEOLOGY,
+            LootTables.TRAIL_RUINS_RARE_ARCHAEOLOGY
+    );
 
     private final SkyGridChunkGeneratorConfig config;
     private final List<EntityType<?>> entities;
@@ -209,29 +224,34 @@ public class SkyGridChunkGenerator extends ChunkGenerator {
                     BlockState state = block.getDefaultState().withIfExists(Properties.PERSISTENT, true);
                     chunk.setBlockState(blockPos, state, false);
                     if (block.equals(Blocks.SPAWNER) && !this.entities.isEmpty()) {
-                        MobSpawnerBlockEntity mobSpawnerBlockEntity = new MobSpawnerBlockEntity(new BlockPos(worldX, y, worldZ), block.getDefaultState());
+                        MobSpawnerBlockEntity mobSpawnerBlockEntity = new MobSpawnerBlockEntity(new BlockPos(worldX, y, worldZ), state);
                         mobSpawnerBlockEntity.setEntityType(this.entities.get(random.nextInt(config.spawnerEntities().size())), random);
                         chunk.setBlockEntity(mobSpawnerBlockEntity);
                     } else if (block.equals(Blocks.CHEST)) {
-                        LootableContainerBlockEntity chestBlockEntity = new ChestBlockEntity(new BlockPos(worldX, y, worldZ), block.getDefaultState());
+                        LootableContainerBlockEntity chestBlockEntity = new ChestBlockEntity(new BlockPos(worldX, y, worldZ), state);
                         chunk.setBlockEntity(chestBlockEntity);
                         fillChestBlockEntityWithItems(chestBlockEntity, random, dynamicRegistryManager);
                     } else if (block.equals(Blocks.BARREL)) {
-                        LootableContainerBlockEntity barrelBlockEntity = new BarrelBlockEntity(new BlockPos(worldX, y, worldZ), block.getDefaultState());
+                        LootableContainerBlockEntity barrelBlockEntity = new BarrelBlockEntity(new BlockPos(worldX, y, worldZ), state);
                         chunk.setBlockEntity(barrelBlockEntity);
                         fillChestBlockEntityWithItems(barrelBlockEntity, random, dynamicRegistryManager);
                     } else if (block.equals(Blocks.ENDER_CHEST)) {
-                        EnderChestBlockEntity enderChestBlockEntity = new EnderChestBlockEntity(new BlockPos(worldX, y, worldZ), block.getDefaultState());
+                        EnderChestBlockEntity enderChestBlockEntity = new EnderChestBlockEntity(new BlockPos(worldX, y, worldZ), state);
                         chunk.setBlockEntity(enderChestBlockEntity);
                     } else if (block.equals(Blocks.TRAPPED_CHEST)) {
-                        LootableContainerBlockEntity trappedChestBlockEntity = new TrappedChestBlockEntity(new BlockPos(worldX, y, worldZ), block.getDefaultState());
+                        LootableContainerBlockEntity trappedChestBlockEntity = new TrappedChestBlockEntity(new BlockPos(worldX, y, worldZ), state);
                         chunk.setBlockEntity(trappedChestBlockEntity);
                         fillChestBlockEntityWithItems(trappedChestBlockEntity, random, dynamicRegistryManager);
                     } else if (block.equals(Blocks.ENCHANTING_TABLE)) {
-                        EnchantingTableBlockEntity enchantingTableBlockEntity = new EnchantingTableBlockEntity(new BlockPos(worldX, y, worldZ), block.getDefaultState());
+                        EnchantingTableBlockEntity enchantingTableBlockEntity = new EnchantingTableBlockEntity(new BlockPos(worldX, y, worldZ), state);
                         chunk.setBlockEntity(enchantingTableBlockEntity);
                     } else if (block.equals(Blocks.DECORATED_POT)) {
-                        DecoratedPotBlockEntity blockEntity = new DecoratedPotBlockEntity(new BlockPos(worldX, y, worldZ), block.getDefaultState());
+                        DecoratedPotBlockEntity blockEntity = new DecoratedPotBlockEntity(new BlockPos(worldX, y, worldZ), state);
+                        chunk.setBlockEntity(blockEntity);
+                    } else if (block instanceof BrushableBlock) {
+                        BrushableBlockEntity blockEntity = new BrushableBlockEntity(new BlockPos(worldX, y, worldZ), state);
+                        int lootTabelIndex = random.nextBetween(0, ARCHEOLOGY_LOOT_TABLES.size() - 1);
+                        blockEntity.setLootTable(ARCHEOLOGY_LOOT_TABLES.get(lootTabelIndex), random.nextInt());
                         chunk.setBlockEntity(blockEntity);
                     }
                 }
